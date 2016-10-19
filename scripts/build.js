@@ -10,6 +10,7 @@ const fs = require('@offirmo/cli-toolbox/fs/extra')
 
 
 const NEEDED_FILES_FROM_MODULES = [
+	// order matters !
 	'jquery/dist/jquery.js',
 	'fullpage.js/vendors/scrolloverflow.js',
 	'fullpage.js/dist/jquery.fullpage.extensions.min.js',
@@ -19,15 +20,12 @@ const NEEDED_FILES_FROM_MODULES = [
 	'tachyons/css/tachyons.min.css',
 ]
 
-const FILES_RENAMES = {
-	'fullpage.js/vendors/scrolloverflow.js':
-		''
-}
-
 const MODULES_ROOT = 'node_modules'
 const BUILD_DIR = 'third-party'
 
 fs.emptyDirSync(BUILD_DIR)
+
+let header_deps = ''
 
 NEEDED_FILES_FROM_MODULES.forEach(dep_path => {
 	const [module, ...temp] = dep_path.split('/')
@@ -47,4 +45,11 @@ NEEDED_FILES_FROM_MODULES.forEach(dep_path => {
 
 	fs.copySync(path.join(MODULES_ROOT, dep_path), path.join(BUILD_DIR, target_filename))
 	fs.copySync(path.join(BUILD_DIR, target_filename), path.join(BUILD_DIR, target_filename_major))
+
+	if (dep_path_parsed.ext === '.css')
+		header_deps += `\n<link rel="stylesheet" type="text/css" href="../${BUILD_DIR}/${target_filename_major}" />`
+	else
+		header_deps += `\n<script src="../${BUILD_DIR}/${target_filename_major}"></script>`
 })
+
+console.log(header_deps)
