@@ -2,42 +2,46 @@
 # yarn lockfile v1
 argparse@^1.0.7:
   version "1.0.9"
-  resolved "https://registry.yarnpkg.com/argparse/-/argparse-1.0.9.tgz#73d83bc263f86e97f8cc4f6bae1b0e90a7d22c86"
+  resolved "https://npm.dashlane.com/repository/npm/argparse/-/argparse-1.0.9.tgz#73d83bc263f86e97f8cc4f6bae1b0e90a7d22c86"
   dependencies:
     sprintf-js "~1.0.2"
 
 esprima@^2.6.0:
   version "2.7.3"
-  resolved "https://registry.yarnpkg.com/esprima/-/esprima-2.7.3.tgz#96e3b70d5779f6ad49cd032673d1c312767ba581"
+  resolved "https://npm.dashlane.com/repository/npm/esprima/-/esprima-2.7.3.tgz#96e3b70d5779f6ad49cd032673d1c312767ba581"
 
-flipclock:
+flipclock@^0.7.8:
   version "0.7.8"
-  resolved "https://registry.yarnpkg.com/flipclock/-/flipclock-0.7.8.tgz#f37f1f7ca9044d902c1fee1f1ae7f4bd1eef1a54"
+  resolved "https://npm.dashlane.com/repository/npm/flipclock/-/flipclock-0.7.8.tgz#f37f1f7ca9044d902c1fee1f1ae7f4bd1eef1a54"
   dependencies:
     jquery ">=1.7"
 
-fullpage.js:
+fullpage.js@^2.8.7:
   version "2.8.7"
-  resolved "https://registry.yarnpkg.com/fullpage.js/-/fullpage.js-2.8.7.tgz#ea381391a325428eacefed215eda0dc1ebf12ef9"
+  resolved "https://npm.dashlane.com/repository/npm/fullpage.js/-/fullpage.js-2.8.7.tgz#ea381391a325428eacefed215eda0dc1ebf12ef9"
   dependencies:
     jquery ">=1.6.0"
 
-jquery, jquery@>=1.6.0, jquery@>=1.7:
+jquery@^3.1.1, jquery@>=1.6.0, jquery@>=1.7:
   version "3.1.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.1.1.tgz#347c1c21c7e004115e0a4da32cece041fad3c8a3"
+  resolved "https://npm.dashlane.com/repository/npm/jquery/-/jquery-3.1.1.tgz#347c1c21c7e004115e0a4da32cece041fad3c8a3"
 
-js-yaml:
+js-yaml@^3.6.1:
   version "3.6.1"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.6.1.tgz#6e5fe67d8b205ce4d22fad05b7781e8dadcc4b30"
+  resolved "https://npm.dashlane.com/repository/npm/js-yaml/-/js-yaml-3.6.1.tgz#6e5fe67d8b205ce4d22fad05b7781e8dadcc4b30"
   dependencies:
     argparse "^1.0.7"
     esprima "^2.6.0"
 
+lodash:
+  version "4.16.4"
+  resolved "https://npm.dashlane.com/repository/npm/lodash/-/lodash-4.16.4.tgz#01ce306b9bad1319f2a5528674f88297aeb70127"
+
 sprintf-js@~1.0.2:
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
+  resolved "https://npm.dashlane.com/repository/npm/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
 
-tachyons:
+tachyons@^4.5.4:
   version "4.5.4"
-  resolved "https://registry.yarnpkg.com/tachyons/-/tachyons-4.5.4.tgz#e639f2d55a8c8d8b810e2746f053bb2e4f1d5b66"
+  resolved "https://npm.dashlane.com/repository/npm/tachyons/-/tachyons-4.5.4.tgz#e639f2d55a8c8d8b810e2746f053bb2e4f1d5b66"
 
