@@ -10,7 +10,9 @@
   "author": "Offirmo <offirmo.net@gmail.com>",
   "license": "UNLICENSED",
   "scripts": {
-    "build": "./scripts/build.js"
+    "build": "./scripts/build.js",
+    "puer": "puer --exclude 'node_modules|yarn_modules' --port $PORT",
+    "start": "npm run puer"
   },
   "dependencies": {
     "flipclock": "^0.7.8",
@@ -22,6 +24,7 @@
   "devDependencies": {
     "@offirmo/cli-toolbox": "0.0.4",
     "lodash": "^4.16.4",
+    "puer": "^1.1.1",
     "semver": "^5.3.0"
   }
 }
