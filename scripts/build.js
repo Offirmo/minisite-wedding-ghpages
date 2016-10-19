@@ -46,7 +46,5 @@ NEEDED_FILES_FROM_MODULES.forEach(dep_path => {
 	console.log(module, version, id, filename, semver.major(version), target_filename, target_filename_major)
 
 	fs.copySync(path.join(MODULES_ROOT, dep_path), path.join(BUILD_DIR, target_filename))
-	fs.ensureSymlinkSync(path.join(BUILD_DIR, target_filename), path.join(BUILD_DIR, target_filename_major))
+	fs.copySync(path.join(BUILD_DIR, target_filename), path.join(BUILD_DIR, target_filename_major))
 })
-
-

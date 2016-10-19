@@ -9,6 +9,9 @@
   },
   "author": "Offirmo <offirmo.net@gmail.com>",
   "license": "UNLICENSED",
+  "scripts": {
+    "build": "./scripts/build.js"
+  },
   "dependencies": {
     "flipclock": "^0.7.8",
     "fullpage.js": "^2.8.7",
