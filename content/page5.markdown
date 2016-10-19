@@ -1,5 +1,5 @@
 ---
-title:  "Accueil"
+title.fr:  "Liste de mariage"
 background: "#111111"
 picture: "foo.jpg"
 ---
