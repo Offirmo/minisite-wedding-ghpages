@@ -1,3 +1,8 @@
+---
+title:  "Accueil"
+background: "#111111"
+picture: "foo.jpg"
+---
 
 # FOO
 
