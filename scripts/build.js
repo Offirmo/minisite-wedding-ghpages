@@ -12,13 +12,14 @@ const fs = require('@offirmo/cli-toolbox/fs/extra')
 const NEEDED_FILES_FROM_MODULES = [
 	// order matters !
 	'@typicode/pegasus/dist/pegasus.js',
+	'tachyons/css/tachyons.min.css',
+	'js-yaml/dist/js-yaml.js',
 	'jquery/dist/jquery.js',
 	'fullpage.js/vendors/scrolloverflow.js',
 	'fullpage.js/dist/jquery.fullpage.extensions.min.js',
 	'fullpage.js/dist/jquery.fullpage.css',
 	'flipclock/compiled/flipclock.js',
 	'flipclock/compiled/flipclock.css',
-	'tachyons/css/tachyons.min.css',
 ]
 
 const MODULES_ROOT = 'node_modules'

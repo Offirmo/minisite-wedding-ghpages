@@ -8,14 +8,33 @@
 	<title>TODO TITLE</title>
 	<link rel="icon" href="content/favicon.png" type="image/png" />
 
-	<script src="../third-party/pegasus@0.js"></script>
+	<script>
+		var state = {
+			errors: []
+		}
+	</script>
+
+	<script>
+		//0.3.5
+		function pegasus(a,b,c){return c=new XMLHttpRequest,c.open("GET",a),a=[],pegasus.timeout&&(c.timeout=pegasus.timeout),c.ontimeout=function(a){b=a},c.onreadystatechange=c.then=function(d,e,f,g){if(d&&d.call&&(a=[,d,e]),b&&a[2]&&a[2](b,c),4==c.readyState&&(f=a[0|c.status/200])){try{g=JSON.parse(c.responseText)}catch(a){g=null}f(g,c)}},c.send(),c}
+
+		var config_p = pegasus('content/config.yaml')
+		var page1_p = pegasus('content/page1.markdown')
+		var page2_p = pegasus('content/page2.markdown')
+		var page3_p = pegasus('content/page3.markdown')
+		var page4_p = pegasus('content/page4.markdown')
+		var page5_p = pegasus('content/page5.markdown')
+		var page6_p = pegasus('content/page6.markdown')
+	</script>
+
+	<link rel="stylesheet" type="text/css" href="../third-party/tachyons.min@4.css" />
+	<script src="../third-party/js-yaml@3.js"></script>
 	<script src="../third-party/jquery@3.js"></script>
 	<script src="../third-party/fullpage.scrolloverflow@2.js"></script>
 	<script src="../third-party/fullpage.extensions.min@2.js"></script>
 	<link rel="stylesheet" type="text/css" href="../third-party/fullpage@2.css" />
 	<script src="../third-party/flipclock@0.js"></script>
 	<link rel="stylesheet" type="text/css" href="../third-party/flipclock@0.css" />
-	<link rel="stylesheet" type="text/css" href="../third-party/tachyons.min@4.css" />
 
 	<xlink rel="stylesheet" href="../../node_modules/tachyons-debug/css/tachyons-debug.css"/>
 
@@ -191,6 +210,11 @@
 			image: "../assets/jquery-countdown/img/digits.png"
 		})*/
 	})
+
+	config_p.then(
+		function (json, xhr) {console.log(xhr.responseText)},
+		function () {console.error(arguments)}
+	)
 
 	// https://github.com/alvarotrigo/fullPage.js
 	// http://www.zondicons.com/
