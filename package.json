@@ -15,6 +15,7 @@
     "start": "npm run puer"
   },
   "dependencies": {
+    "@typicode/pegasus": "^0.3.5",
     "flipclock": "^0.7.8",
     "fullpage.js": "^2.8.7",
     "jquery": "^3.1.1",
@@ -25,6 +26,7 @@
     "@offirmo/cli-toolbox": "0.0.4",
     "lodash": "^4.16.4",
     "puer": "^1.1.1",
+    "region-flags": "^1.0.1",
     "semver": "^5.3.0"
   }
 }
