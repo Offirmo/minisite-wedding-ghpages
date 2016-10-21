@@ -8,7 +8,6 @@ const path = require('path')
 const semver = require('semver')
 const fs = require('@offirmo/cli-toolbox/fs/extra')
 
-
 const NEEDED_FILES_FROM_MODULES = [
 	// order matters !
 	'@typicode/pegasus/dist/pegasus.js',
@@ -23,9 +22,11 @@ const NEEDED_FILES_FROM_MODULES = [
 ]
 
 const MODULES_ROOT = 'node_modules'
-const BUILD_DIR = 'third-party'
+const CLEAN_THIRD_PARTY_DIR = 'third-party'
+const DIST_DIR = 'dist'
 
-fs.emptyDirSync(BUILD_DIR)
+fs.emptyDirSync(CLEAN_THIRD_PARTY_DIR)
+fs.emptyDirSync(DIST_DIR)
 
 let header_deps = ''
 
@@ -44,13 +45,23 @@ NEEDED_FILES_FROM_MODULES.forEach(dep_path => {
 	let target_filename_major = target_name + '@' + semver.major(version) + dep_path_parsed.ext
 	console.log(module, version, id, semver.major(version), target_filename, target_filename_major)
 
-	fs.copySync(path.join(MODULES_ROOT, dep_path), path.join(BUILD_DIR, target_filename))
-	fs.copySync(path.join(BUILD_DIR, target_filename), path.join(BUILD_DIR, target_filename_major))
+	fs.copySync(path.join(MODULES_ROOT, dep_path), path.join(CLEAN_THIRD_PARTY_DIR, target_filename))
+	fs.copySync(path.join(CLEAN_THIRD_PARTY_DIR, target_filename), path.join(CLEAN_THIRD_PARTY_DIR, target_filename_major))
 
 	if (dep_path_parsed.ext === '.css')
-		header_deps += `\n<link rel="stylesheet" type="text/css" href="../${BUILD_DIR}/${target_filename_major}" />`
+		header_deps += `\n<link rel="stylesheet" type="text/css" href="${CLEAN_THIRD_PARTY_DIR}/${target_filename_major}" />`
 	else
-		header_deps += `\n<script src="../${BUILD_DIR}/${target_filename_major}"></script>`
+		header_deps += `\n<script src="${CLEAN_THIRD_PARTY_DIR}/${target_filename_major}"></script>`
 })
 
-console.log(header_deps)
+// https://github.com/Offirmo/node-typescript-compiler
+const tsc = require('node-typescript-compiler')
+tsc.compile({
+	'project': '.'
+	// https://www.typescriptlang.org/docs/handbook/compiler-options.html
+}).then(() => {
+	header_deps += `\n<script src="${DIST_DIR}/minisite.js"></script>`
+
+	console.log(header_deps)
+})
+

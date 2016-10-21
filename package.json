@@ -25,8 +25,10 @@
   "devDependencies": {
     "@offirmo/cli-toolbox": "0.0.4",
     "lodash": "^4.16.4",
+    "node-typescript-compiler": "^1.1.1",
     "puer": "^1.1.1",
     "region-flags": "^1.0.1",
-    "semver": "^5.3.0"
+    "semver": "^5.3.0",
+    "typescript": "^2.0.3"
   }
 }

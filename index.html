@@ -3,14 +3,56 @@
 
 <head>
 	<meta charset="utf-8" />
+	<!-- This site is not meant to be indexed -->
+	<meta name="robots" content="noindex">
+	<!-- Never send referrer -->
+	<meta name="referrer" content="never">
+	<!-- responsive -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>TODO TITLE</title>
 	<link rel="icon" href="content/favicon.png" type="image/png" />
 
 	<script>
+
 		var state = {
+			lang: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0],
 			errors: []
+		}
+
+		var content = {}
+		content[state.lang] = {
+			common: {},
+			page1: {
+				title: '#1',
+				image: 'cat.jpg',
+				content: 'lorem ipsum'
+			},
+			page2: {
+				title: '#2',
+				image: 'cat.jpg',
+				content: 'lorem ipsum'
+			},
+			page3: {
+				title: '#3',
+				image: 'cat.jpg',
+				content: 'lorem ipsum'
+			},
+			page4: {
+				title: '#4',
+				image: 'cat.jpg',
+				content: 'lorem ipsum'
+			},
+			page5: {
+				title: '#5',
+				image: 'cat.jpg',
+				content: 'lorem ipsum'
+			},
+			page6: {
+				title: '#6',
+				image: 'cat.jpg',
+				content: 'lorem ipsum'
+			},
 		}
 	</script>
 
@@ -18,30 +60,39 @@
 		//0.3.5
 		function pegasus(a,b,c){return c=new XMLHttpRequest,c.open("GET",a),a=[],pegasus.timeout&&(c.timeout=pegasus.timeout),c.ontimeout=function(a){b=a},c.onreadystatechange=c.then=function(d,e,f,g){if(d&&d.call&&(a=[,d,e]),b&&a[2]&&a[2](b,c),4==c.readyState&&(f=a[0|c.status/200])){try{g=JSON.parse(c.responseText)}catch(a){g=null}f(g,c)}},c.send(),c}
 
-		var config_p = pegasus('content/config.yaml')
-		var page1_p = pegasus('content/page1.markdown')
-		var page2_p = pegasus('content/page2.markdown')
-		var page3_p = pegasus('content/page3.markdown')
-		var page4_p = pegasus('content/page4.markdown')
-		var page5_p = pegasus('content/page5.markdown')
-		var page6_p = pegasus('content/page6.markdown')
+		var peg = {
+			config: pegasus('content/config.yaml'),
+			page1: pegasus('content/page1.markdown'),
+			page2: pegasus('content/page2.markdown'),
+			page3: pegasus('content/page3.markdown'),
+			page4: pegasus('content/page4.markdown'),
+			page5: pegasus('content/page5.markdown'),
+			page6: pegasus('content/page6.markdown')
+		}
 	</script>
 
-	<link rel="stylesheet" type="text/css" href="../third-party/tachyons.min@4.css" />
-	<script src="../third-party/js-yaml@3.js"></script>
-	<script src="../third-party/jquery@3.js"></script>
-	<script src="../third-party/fullpage.scrolloverflow@2.js"></script>
-	<script src="../third-party/fullpage.extensions.min@2.js"></script>
-	<link rel="stylesheet" type="text/css" href="../third-party/fullpage@2.css" />
-	<script src="../third-party/flipclock@0.js"></script>
-	<link rel="stylesheet" type="text/css" href="../third-party/flipclock@0.css" />
+	<script src="third-party/pegasus@0.js"></script>
+	<link rel="stylesheet" type="text/css" href="third-party/tachyons.min@4.css" />
+	<script src="third-party/js-yaml@3.js"></script>
+	<script src="third-party/jquery@3.js"></script>
+	<script src="third-party/fullpage.scrolloverflow@2.js"></script>
+	<script src="third-party/fullpage.extensions.min@2.js"></script>
+	<link rel="stylesheet" type="text/css" href="third-party/fullpage@2.css" />
+	<script src="third-party/flipclock@0.js"></script>
+	<link rel="stylesheet" type="text/css" href="third-party/flipclock@0.css" />
+	<script src="dist/minisite.js"></script>
 
-	<xlink rel="stylesheet" href="../../node_modules/tachyons-debug/css/tachyons-debug.css"/>
+	<xlink rel="stylesheet" href="node_modules/tachyons-debug/css/tachyons-debug.css"/>
 
 	<style type="text/css">
 		body {
+			font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 			background-color: #DFDBE5;
 			background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+		}
+
+		.delayed-display {
+			display: none;
 		}
 
 		/*
@@ -62,18 +113,18 @@
 	</style>
 </head>
 
-<header class="fixed z-1 w-100 ph2 pv2 pv3-ns bg-black-90">
+<header class="delayed-display fixed z-1 w-100 ph2 pv2 pv3-ns bg-black-90">
 	<nav id="fpmenu" class="f6 fw6-ns ttu tc">
-		<a class="link dim white dib mr3 mr4-ns" href="#page1">Accueil</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page2">Comment venir ?</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page3">Le jour J</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page4">Prolonger son WE</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page5">Liste de mariage</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page6">Contact</a>
+		<a class="link dim white dib mr3 mr4-ns" href="#page1">#TODO</a>
+		<a class="link dim white dib mr3 mr4-ns" href="#page2">#TODO</a>
+		<a class="link dim white dib mr3 mr4-ns" href="#page3">#TODO</a>
+		<a class="link dim white dib mr3 mr4-ns" href="#page4">#TODO</a>
+		<a class="link dim white dib mr3 mr4-ns" href="#page5">#TODO</a>
+		<a class="link dim white dib mr3 mr4-ns" href="#page6">#TODO</a>
 	</nav>
 </header>
 
-<div id="fullpage">
+<div id="fullpage" class="delayed-display">
 
 	<div class="section">
 		<article class="dt w-100">
@@ -173,8 +224,6 @@
 	</div>
 </div>
 
-
-
 <script>
 	$(document).ready(function() {
 		$('#fullpage').fullpage({
@@ -198,7 +247,6 @@
 		})
 
 		//style="width: 65em; margin: auto; transform: scale(.75);"
-
 
 		/*$("#countdown").countdown({
 			stepTime: 60,
