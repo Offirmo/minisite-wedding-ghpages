@@ -57,7 +57,7 @@ window.minisite = (function(env) {
 		const { lang } = data
 
 		return `
-<div class="br2-ns bb ba-ns br2-ns b--black-10 bg-white-80 mv3-ns w-100 w-50-m w-50-l mw6 center">
+<div class="br2-ns bb ba-ns br2-ns b--black-10 bg-white-80 mv3-ns w-100 mw6-5 center">
 	<div class="ph3">
 		<h2 class="mv2"><img src="${I18N.svg_flag[lang]}" class="v-base mr1" width="26">${I18N.wall_header[lang](data)}</h2>
 		<p class="f6">${I18N.wall_text[lang]}</p>
@@ -208,6 +208,9 @@ window.minisite = (function(env) {
 				if (password === content.config.password) {
 					on_successful_auth()
 					env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password)
+				}
+				else {
+					// TODO instructions !
 				}
 			})
 	}
