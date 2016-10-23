@@ -57,21 +57,25 @@
 </head>
 
 
-<div id="login" class="dt w-100 vh-100 navy pv4-ns">
+<div id="wall" class="dt w-100 vh-100 navy pv4-ns">
 
 	<div class="br2-ns w-100 w-50-m w-50-l mw6 center">
 		<img src="content/splash.png" class="db w-100 br2-ns">
 	</div>
+
+	<div id="wall-form">
+
+	</div>
 </div>
 
-<header class="delayed-display fixed z-1 w-100 ph2 pv2 pv3-ns bg-black-90">
-	<nav id="fpmenu" class="f6 fw6-ns ttu tc">
-		<a class="link dim white dib mr3 mr4-ns" href="#page1">#TODO</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page2">#TODO</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page3">#TODO</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page4">#TODO</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page5">#TODO</a>
-		<a class="link dim white dib mr3 mr4-ns" href="#page6">#TODO</a>
+<header class="delayed-display fixed z-1 w-100 ph2 pv2 pv3-ns bg-white-80">
+	<nav id="fp-menu" class="f6 fw6-ns ttu tc">
+		<a class="link near-black dib mr3 mr4-ns" href="#page1">#TODO</a>
+		<a class="link near-black dib mr3 mr4-ns" href="#page2">#TODO</a>
+		<a class="link near-black dib mr3 mr4-ns" href="#page3">#TODO</a>
+		<a class="link near-black dib mr3 mr4-ns" href="#page4">#TODO</a>
+		<a class="link near-black dib mr3 mr4-ns" href="#page5">#TODO</a>
+		<a class="link near-black dib mr3 mr4-ns" href="#page6">#TODO</a>
 	</nav>
 </header>
 
@@ -176,26 +180,7 @@
 </div>
 
 <script>
-	$(document).ready(function() {
-		$('#fullpage').fullpage({
-			sectionsColor: ['#4BBFC3', '#7BAABE', '#4BBFC3', '#7BAABE', '#4BBFC3', '#7BAABE', ],
-			anchors: ['page1', 'page2', 'page3', 'page4', 'page5', 'page6'],
-			menu: '#fpmenu',
-			paddingTop: '48px',
-			bigSectionsDestination: 'top',
-			//scrollBar: true,
-			scrollOverflow: true
-		})
 
-		// countdown to ; month starts at 0
-		var date  = new Date(Date.UTC(2017, 6, 1, 16, 0, 0));
-		var now   = new Date();
-		var diff  = date.getTime()/1000 - now.getTime()/1000;
-		$('#countdown').FlipClock(diff, {
-			clockFace: 'DailyCounter',
-			countdown: true,
-			language: 'fr'
-		})
 
 		//style="width: 65em; margin: auto; transform: scale(.75);"
 

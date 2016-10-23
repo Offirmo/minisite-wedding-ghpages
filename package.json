@@ -11,7 +11,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "./scripts/build.js",
-    "puer": "puer --exclude 'node_modules|yarn_modules' --port $PORT",
+    "puer": "puer --filetype 'js|css|html|yaml|markdown' --exclude 'node_modules|yarn_modules|scripts' --port $PORT",
     "start": "npm run puer"
   },
   "dependencies": {
