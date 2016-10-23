@@ -24,9 +24,16 @@ const NEEDED_FILES_FROM_MODULES = [
 const MODULES_ROOT = 'node_modules'
 const CLEAN_THIRD_PARTY_DIR = 'third-party'
 const DIST_DIR = 'dist'
+const FLAGS_DIR = path.join(CLEAN_THIRD_PARTY_DIR, 'flags')
 
 fs.emptyDirSync(CLEAN_THIRD_PARTY_DIR)
 fs.emptyDirSync(DIST_DIR)
+
+fs.ensureDirSync(FLAGS_DIR);
+['svg', 'png'].forEach(type => fs.copySync(
+	path.join(MODULES_ROOT, 'region-flags', type),
+	path.join(FLAGS_DIR, type)
+))
 
 let header_deps = ''
 
