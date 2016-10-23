@@ -59,7 +59,7 @@ window.minisite = (function(env) {
 		return `
 <div class="br2-ns bb ba-ns br2-ns b--black-10 bg-white-80 mv3-ns w-100 mw6-5 center">
 	<div class="ph3">
-		<h2 class="mv2"><img src="${I18N.svg_flag[lang]}" class="v-base mr1" width="26">${I18N.wall_header[lang](data)}</h2>
+		<h2 class="mv2"><img src="${I18N.svg_flag[lang]}" class="v-base mr2" width="26">${I18N.wall_header[lang](data)}</h2>
 		<p class="f6">${I18N.wall_text[lang]}</p>
 		<p>
 		<form onSubmit="wall_check(this.elements[0].value), false">
@@ -230,7 +230,7 @@ window.minisite = (function(env) {
 	}
 
 	function render_main(content) {
-		$('#fullpage').fullpage({
+		/*$('#fullpage').fullpage({
 			sectionsColor: ['#4BBFC3', '#7BAABE', '#4BBFC3', '#7BAABE', '#4BBFC3', '#7BAABE', ],
 			anchors: ['page1', 'page2', 'page3', 'page4', 'page5', 'page6'],
 			menu: '#fp-menu',
@@ -238,7 +238,7 @@ window.minisite = (function(env) {
 			bigSectionsDestination: 'top',
 			//scrollBar: true,
 			scrollOverflow: true
-		})
+		})*/
 
 		// countdown to ; month starts at 0
 		var date  = new Date(Date.UTC(2017, 6, 1, 16, 0, 0));
