@@ -217,7 +217,7 @@ window.minisite = (function(env) {
 		const el_wall = document.querySelectorAll('#wall')[0]
 		el_wall.style.display = 'none'
 		const el_site = document.querySelectorAll('.delayed-display')
-		el_site.forEach(el => el.classList.remove('delayed-display'))
+		el_site.forEach(el => el.classList.remove('dn'))
 	})
 
 	function render_wall(content) {
