@@ -1,19 +1,9 @@
-# minisite-w
-EXPERIMENTAL
+## Minisite
 
-## Features
-* super fast, super simple, super safe (static files !!)
-* super cheap (github pages) you pay only if you want a custom domain !
-* editable and configurable by non-tech people
+**TL,DR; Stuff is in branch `master_noindex`**
 
+### Why is this empty ?
 
+Public Github repos "master" branch are indexable (and indexed) by google: http://stackoverflow.com/questions/15844905/how-to-stop-google-indexing-my-github-repository
 
-## Install
-Just clone this repo and activate github-pages.
-
-
-## Inspiration
-https://app.ewedding.com/demo?theme=candy
-
-## Contributing
-See CONTRIBUTING.md
+For confidentiality reason and avoiding duplicate content, the default branch of this repo was set to "master_noindex" and this one has been emptied.

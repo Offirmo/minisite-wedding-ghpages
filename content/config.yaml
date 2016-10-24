@@ -1,5 +1,0 @@
-bride: !!str Chloé
-groom: !!str Yves‑Emmanuel
-date: !!timestamp 2017-07-01
-languages: !!seq [ fr, en ]
-password: !!str CYE2017
