@@ -82,8 +82,9 @@ window.minisite = (function(env) {
 		<h2 class="mv2"><img src="${I18N.svg_flag[lang]}" class="v-base mr2" width="26">${I18N.wall_header[lang](data)}</h2>
 		<p class="f6">${I18N.wall_text[lang]}</p>
 		<p>
-		<form onSubmit="wall_check(this.elements[0].value), false">
+		<form onSubmit="wall_check(this.elements[0].value, this.elements[1].value), false">
 			<label for="mdpInput">${I18N.wall_password_label[lang]}</label>
+			<input id="langInput" class="dn" value="${lang}" />
 			<input id="mdpInput" class="input-reset mw3" placeholder="${I18N.wall_password_placeholder[lang]}" />
 			<button type="submit" class="button-reset">${I18N.wall_password_cta[lang]}</button>
 		</form>
@@ -232,7 +233,9 @@ window.minisite = (function(env) {
 		}
 	})
 
-	env.wall_check = (password) => {
+	env.wall_check = (lang, password) => {
+		logger.info('chosen lang', lang)
+		state.lang = lang
 		logger.info('checking', password)
 		state.ready_p
 			.then(content => {
@@ -296,6 +299,10 @@ window.minisite = (function(env) {
 
 	function render(content) {
 		logger.log('Rendering...')
+
+		// XX refresh on lang change
+		env.document.title = I18N.wall_header[state.lang || 'en'](content.config)
+
 		render_wall(content)
 		render_main(content)
 	}
