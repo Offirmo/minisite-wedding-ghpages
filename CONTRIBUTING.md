@@ -2,6 +2,8 @@
 ## Install
 ```
 npm i -gs yarn
+yarn
+yarn --modules-folder yarn_modules
 yarn --flat --modules-folder yarn_modules
 ```
 

@@ -9,13 +9,17 @@ window.minisite = (function(env) {
 	const CONSTS = {
 		LS_KEYS: {
 			last_successful_password: 'minisite.last_successful_password'
-		}
+		},
+		MAX_PAGES: 10,
+		AVAILABLE_UI_LANGUAGES: [ 'en', 'fr' ],
+		DEFAULT_UI_LANG: 'en',
+		NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0]
 	}
-	const MAX_PAGES = 10
-	const AVAILABLE_LANGUAGES = [ 'en', 'fr' ]
-	const DEFAULT_LANG = 'en'
-	const PAGE_ITERATOR = [...Array(MAX_PAGES)].map((x, i) => i)
-	const DEFAULT_CONTENT = {
+
+	// Helper
+	const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
+
+	/*const DEFAULT_CONTENT = {
 		common: {
 		},
 		pages: PAGE_ITERATOR.map(i => ({
@@ -24,8 +28,8 @@ window.minisite = (function(env) {
 			image: 'cat.jpg',
 			content: `#${i} Lorem ipsum`
 		}))
-	}
-	const NAVIGATOR_LANG = (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0]
+	}*/
+
 	const I18N = {
 		svg_flag: {
 			en: 'third-party/flags/svg/US.svg',
@@ -53,6 +57,22 @@ window.minisite = (function(env) {
 		},
 
 	}
+
+	////////////////////////////////////
+	let on_successful_load
+	let on_successful_auth
+
+	const state = {
+		is_ready: false,
+		ready_p: new Promise((resolve) => on_successful_load = resolve),
+		is_authentified: false,
+		authentified_p: new Promise((resolve) => on_successful_auth = resolve),
+		lang: undefined,
+		errors: [],
+	}
+
+	////////////////////////////////////
+
 	function TEMPLATE_WALL(data) {
 		const { lang } = data
 
@@ -74,30 +94,15 @@ window.minisite = (function(env) {
 	}
 
 	////////////////////////////////////
-	const state = {
-		ready: undefined,
-		authentified: undefined,
-		lang: NAVIGATOR_LANG,
-		errors: [],
-	}
-
-	const content = {
-		config: {},
-		pages: {},
-	}
-
-	////////////////////////////////////
 	const logger = console
-	const pegasus = env.pegasus
+	logger.log('constants', CONSTS)
+
+	const pegasus = env.pegasus // TODO use fetch
 	if (! pegasus) state.errors.push('Expected lib "pegasus" not found !')
 
 	////////////////////////////////////
 
-	////////////////////////////////////
-	logger.log('constants', {
-		MAX_PAGES, DEFAULT_LANG, DEFAULT_CONTENT
-	})
-
+	// TODO use fetch
 	function load_raw_file(url, required = false) {
 		// turn pegasus into real promise
 		const p = new Promise((resolve, reject) => pegasus(url).then((x, xhr) => resolve(xhr.responseText), reject))
@@ -113,6 +118,16 @@ window.minisite = (function(env) {
 			})
 	}
 
+	function parse_yaml_safely(raw_data) {
+		try {
+			return jsyaml.safeLoad(raw_data, { onWarning: logger.warn })
+		}
+		catch (err) {
+			// TODO rewrite the error to be more explicit
+			err.message = 'YAML parsing: ' + err.message
+			throw err
+		}
+	}
 	function attempt_load() {
 		logger.info('Attempting to load latest data...')
 
@@ -158,39 +173,56 @@ window.minisite = (function(env) {
 				return raw
 			})
 			.catch(err => {
-				console.error('Load finished, fetch failed !', err)
+				logger.error('Load finished, fetch failed !', err)
 				throw err
 			})
 	}
 
-	let on_successful_load
-	state.ready = new Promise((resolve) => on_successful_load = resolve)
-	let on_successful_auth
-	state.authentified = new Promise((resolve) => on_successful_auth = resolve)
+	function parse(raw_data) {
+		// decode
+		const content = {
+			config: {},
+			pages: {},
+		}
+
+		content.config = parse_yaml_safely(raw_data.config)
+
+		content.pages = raw_data.pages.map(parse_page)
+
+		return content
+	}
+
+	function parse_page(raw_data) {
+		const result = {}
+
+		let [header, ...content] = raw_data.split('---')
+		if (! content.length) throw new Error('Malformed page: couldn’t separate header/content !')
+
+		const meta = parse_yaml_safely(header)
+		result.meta = meta
+
+		content = content.join('---') // to take into account possible useful --- markdown
+
+		// TODO clean whitespace
+		// TODO split by lang
+		// TODO autodetect title
+
+		return result
+	}
 
 	attempt_load()
-		.then(raw_data => {
-			// decode
-			const content = {
-				config: {},
-				pages: {},
-			}
-
-			content.config = jsyaml.safeLoad(raw_data.config, { onWarning: console.warn })
-
-			return content
-		})
+		.then(parse)
 		.then(content => {
-			console.log('content loaded !', content)
+			logger.log('content loaded !', content)
 			on_successful_load(content)
 		})
 		.catch(err => {
-			console.error('Load failed !', err)
+			logger.error('Load failed !', err)
 		})
 
-	state.ready.then(() => console.log('content is ready !'))
-	state.ready.then(render)
-	state.ready.then(function attempt_auto_auth(content) {
+	state.ready_p.then(() => logger.log('content is ready !'))
+	state.ready_p.then(render)
+	state.ready_p.then(function attempt_auto_auth(content) {
 		const last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password)
 		if (!last_successful_password) return
 
@@ -201,10 +233,10 @@ window.minisite = (function(env) {
 	})
 
 	env.wall_check = (password) => {
-		console.info('checking', password)
-		state.ready
+		logger.info('checking', password)
+		state.ready_p
 			.then(content => {
-				console.info('content ready, checking pwd', content.config.password)
+				logger.info('content ready, checking pwd', content.config.password)
 				if (password === content.config.password) {
 					on_successful_auth()
 					env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password)
@@ -215,7 +247,7 @@ window.minisite = (function(env) {
 			})
 	}
 
-	state.authentified.then(() => {
+	state.authentified_p.then(() => {
 		logger.info('Successful auth !')
 		const el_wall = document.querySelectorAll('#wall')[0]
 		el_wall.style.display = 'none'
@@ -224,7 +256,18 @@ window.minisite = (function(env) {
 	})
 
 	function render_wall(content) {
-		const new_html = content.config.languages.map(lang => TEMPLATE_WALL(Object.assign({}, content.config, {lang}))).join('\n')
+		let languages = content.config.languages
+		languages = languages.filter(lang => CONSTS.AVAILABLE_UI_LANGUAGES.includes(lang))
+		if (languages.length === 0) {
+			if (CONSTS.AVAILABLE_UI_LANGUAGES.includes(CONSTS.NAVIGATOR_LANG))
+				languages.push(CONSTS.NAVIGATOR_LANG)
+			if (!languages.includes(CONSTS.DEFAULT_UI_LANG))
+				languages.push(CONSTS.DEFAULT_UI_LANG)
+		}
+
+		const new_html = languages
+			.map(lang => TEMPLATE_WALL(Object.assign({}, content.config, {lang})))
+			.join('\n')
 		const el_wall_form = document.querySelectorAll('#wall-form')[0]
 		el_wall_form.innerHTML = new_html
 	}
