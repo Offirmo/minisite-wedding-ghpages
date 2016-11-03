@@ -92,7 +92,7 @@ window.minisite = (function(env) {
 	}
 
 	function TEMPLATE_FULLPAGE_SECTION(data) {
-		const { title, picture } = data
+		const { title, picture, markdown } = data
 
 		return `
 <div class="section">
@@ -104,7 +104,7 @@ window.minisite = (function(env) {
 			<img src="../content/${picture}" class="">
 		</header>
 		<div class="fn fl-ns w-50-ns">
-			TODO
+			${marked(markdown)}
 		</div>
 	</article>
 </div>
@@ -118,6 +118,9 @@ window.minisite = (function(env) {
 
 	const pegasus = env.pegasus // TODO use fetch
 	if (! pegasus) state.errors.push('Expected lib "pegasus" not found !')
+
+	const marked = env.marked
+	if (! marked) state.errors.push('Expected lib "marked" not found !')
 
 	////////////////////////////////////
 
@@ -358,7 +361,8 @@ window.minisite = (function(env) {
 		const new_html =  content.pages.map((page, i) => {
 				return TEMPLATE_FULLPAGE_SECTION({
 					title: page.content[state.lang].title,
-					picture: page.meta.picture
+					markdown: page.content[state.lang].text,
+					picture: page.meta.picture,
 				})
 			})
 			.join('\n')

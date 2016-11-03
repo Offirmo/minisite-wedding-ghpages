@@ -68,8 +68,8 @@ window.minisite = (function (env) {
         return "\n<a class=\"link near-black dib mr3 mr4-ns\" href=\"#page" + page_id + "\">" + anchor + "</a>\n\t";
     }
     function TEMPLATE_FULLPAGE_SECTION(data) {
-        var title = data.title, picture = data.picture;
-        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"../content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns\">\n\t\t\tTODO\n\t\t</div>\n\t</article>\n</div>\n";
+        var title = data.title, picture = data.picture, markdown = data.markdown;
+        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"../content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
     ////////////////////////////////////
     var logger = console;
@@ -77,6 +77,9 @@ window.minisite = (function (env) {
     var pegasus = env.pegasus; // TODO use fetch
     if (!pegasus)
         state.errors.push('Expected lib "pegasus" not found !');
+    var marked = env.marked;
+    if (!marked)
+        state.errors.push('Expected lib "marked" not found !');
     ////////////////////////////////////
     function fetch_raw_file(url, required) {
         if (required === void 0) { required = false; }
@@ -279,7 +282,8 @@ window.minisite = (function (env) {
         var new_html = content.pages.map(function (page, i) {
             return TEMPLATE_FULLPAGE_SECTION({
                 title: page.content[state.lang].title,
-                picture: page.meta.picture
+                markdown: page.content[state.lang].text,
+                picture: page.meta.picture,
             });
         })
             .join('\n');

@@ -7,16 +7,12 @@ picture: "Save0001.png"
 ---
 `en`
 
-## bar
+## Welcome to our wedding
 
 Hello [world](http://www.google.com)
 
-:+1:
-
 `fr`
 
-## barre
+## Bienvenue à notre mariage
 
-Bonjour [monde](http://www.google.com)
-
-:+1:
+### Préparez-vous pour le jour J
