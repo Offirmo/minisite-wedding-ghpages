@@ -67,9 +67,16 @@ window.minisite = (function (env) {
         var page_id = data.page_id, anchor = data.anchor;
         return "\n<a class=\"link near-black dib mr3 mr4-ns\" href=\"#page" + page_id + "\">" + anchor + "</a>\n\t";
     }
+    function TEMPLATE_FULLPAGE_SPLASH(data) {
+        var lang = data.lang, bride = data.bride, groom = data.groom;
+        return "\n<div class=\"section\">\n\t<article class=\"dt w-100\">\n\t\t<div class=\"dtc v-mid tc\">\n\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t<h2 class=\"f3 f2-ns\">TODO Lorem ipsum dolor sit amet</h2>\n\n\t\t\t<div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div>\n\t\t</div>\n\t</article>\n</div>\n";
+    }
     function TEMPLATE_FULLPAGE_SECTION(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
-        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"../content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
+        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center mw60em\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns measure\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"../content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
+    }
+    function TEMPLATE_FULLPAGE_FOOTER(data) {
+        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">SOME COMPANY Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a href=\"/language/\" title=\"Language\" class=\"f6 dib ph2 link mid-gray dim\">Language</a>\n\t\t\t<a href=\"/terms/\"    title=\"Terms\" class=\"f6 dib ph2 link mid-gray dim\">Terms of Use</a>\n\t\t\t<a href=\"/privacy/\"  title=\"Privacy\" class=\"f6 dib ph2 link mid-gray dim\">Privacy</a>\n\t\t</div>\n\t</footer>\n</div>\n";
     }
     ////////////////////////////////////
     var logger = console;
@@ -279,13 +286,17 @@ window.minisite = (function (env) {
         el_menu.innerHTML = new_html;
     }
     function render_pages(content, state) {
-        var new_html = content.pages.map(function (page, i) {
+        var new_html = [
+            TEMPLATE_FULLPAGE_SPLASH(Object.assign({}, content.config, { lang: state.lang }))
+        ].concat(content.pages.slice(1).map(function (page, i) {
             return TEMPLATE_FULLPAGE_SECTION({
                 title: page.content[state.lang].title,
                 markdown: page.content[state.lang].text,
                 picture: page.meta.picture,
             });
-        })
+        }), [
+            TEMPLATE_FULLPAGE_FOOTER()
+        ])
             .join('\n');
         var el_fullpage = document.querySelectorAll('#fullpage')[0];
         el_fullpage.innerHTML = new_html;

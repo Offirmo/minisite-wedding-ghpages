@@ -91,25 +91,58 @@ window.minisite = (function(env) {
 	`
 	}
 
+	function TEMPLATE_FULLPAGE_SPLASH(data) {
+		const { lang, bride, groom } = data
+
+		return `
+<div class="section">
+	<article class="dt w-100">
+		<div class="dtc v-mid tc">
+			<h1 class="f2 f1-ns">${I18N.wall_header[lang]({ bride, groom })}</h1>
+			<h2 class="f3 f2-ns">TODO Lorem ipsum dolor sit amet</h2>
+
+			<div id="countdown" class="dib" style="width: auto; transform: scale(.5);"></div>
+		</div>
+	</article>
+</div>
+`
+	}
+
 	function TEMPLATE_FULLPAGE_SECTION(data) {
 		const { title, picture, markdown } = data
 
 		return `
 <div class="section">
-	<article class="cf ph3 ph5-ns pv3">
-		<header class="fn fl-ns w-50-ns pr4-ns">
+	<article class="cf ph3 ph5-ns pv3 center mw60em">
+		<header class="fn fl-ns w-50-ns pr4-ns measure">
 			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
 				${title}
 			</h1>
 			<img src="../content/${picture}" class="">
 		</header>
-		<div class="fn fl-ns w-50-ns">
+		<div class="fn fl-ns w-50-ns measure">
 			${marked(markdown)}
 		</div>
 	</article>
 </div>
 `
 	}
+
+	function TEMPLATE_FULLPAGE_FOOTER(data) {
+		return `
+<div class="section fp-auto-height">
+	<footer class="pb4">
+		<small class="f6 db tc">© 2016 <b class="ttu">SOME COMPANY Inc</b>., All Rights Reserved</small>
+		<div class="tc mt3">
+			<a href="/language/" title="Language" class="f6 dib ph2 link mid-gray dim">Language</a>
+			<a href="/terms/"    title="Terms" class="f6 dib ph2 link mid-gray dim">Terms of Use</a>
+			<a href="/privacy/"  title="Privacy" class="f6 dib ph2 link mid-gray dim">Privacy</a>
+		</div>
+	</footer>
+</div>
+`
+	}
+
 
 
 	////////////////////////////////////
@@ -358,13 +391,17 @@ window.minisite = (function(env) {
 	}
 
 	function render_pages(content, state) {
-		const new_html =  content.pages.map((page, i) => {
-				return TEMPLATE_FULLPAGE_SECTION({
-					title: page.content[state.lang].title,
-					markdown: page.content[state.lang].text,
-					picture: page.meta.picture,
-				})
-			})
+		const new_html =  [
+				TEMPLATE_FULLPAGE_SPLASH(Object.assign({}, content.config, {lang: state.lang})),
+				...content.pages.slice(1).map((page, i) => {
+					return TEMPLATE_FULLPAGE_SECTION({
+						title: page.content[state.lang].title,
+						markdown: page.content[state.lang].text,
+						picture: page.meta.picture,
+					})
+				}),
+				TEMPLATE_FULLPAGE_FOOTER()
+			]
 			.join('\n')
 
 		const el_fullpage = document.querySelectorAll('#fullpage')[0]
