@@ -82,7 +82,7 @@ window.minisite = (function(env) {
 		<h2 class="mv2"><img src="${I18N.svg_flag[lang]}" class="v-base mr2" width="26">${I18N.wall_header[lang](data)}</h2>
 		<p class="f6">${I18N.wall_text[lang]}</p>
 		<p>
-		<form onSubmit="wall_check(this.elements[0].value, this.elements[1].value), false">
+		<form onSubmit="authentify(this.elements[0].value, this.elements[1].value), false">
 			<label for="mdpInput">${I18N.wall_password_label[lang]}</label>
 			<input id="langInput" class="dn" value="${lang}" />
 			<input id="mdpInput" class="input-reset mw3" placeholder="${I18N.wall_password_placeholder[lang]}" />
@@ -129,6 +129,7 @@ window.minisite = (function(env) {
 			throw err
 		}
 	}
+
 	function attempt_load() {
 		logger.info('Attempting to load latest data...')
 
@@ -194,19 +195,31 @@ window.minisite = (function(env) {
 	}
 
 	function parse_page(raw_data) {
+		logger.group('parsing page data...');
+		//logger.log('raw data', raw_data)
+
 		const result = {}
 
-		let [header, ...content] = raw_data.split('---')
-		if (! content.length) throw new Error('Malformed page: couldn’t separate header/content !')
+		const raw_splitted = raw_data.split('---').map(s => s.trim()).filter(l => l)
+		//logger.log('raw splitted', raw_splitted)
 
-		const meta = parse_yaml_safely(header)
+		let [raw_header, ...raw_content] = raw_splitted
+		if (! raw_content.length) throw new Error('Malformed page: couldn’t separate header/content !')
+
+		//logger.log('raw header', raw_header)
+		const meta = parse_yaml_safely(raw_header)
 		result.meta = meta
+		logger.log('parsed header', result.meta)
 
-		content = content.join('---') // to take into account possible useful --- markdown
+		logger.log('raw content', raw_content)
+
+		raw_content = raw_content.join('---') // to take into account possible useful --- markdown
 
 		// TODO clean whitespace
 		// TODO split by lang
 		// TODO autodetect title
+
+		logger.groupEnd()
 
 		return result
 	}
@@ -214,7 +227,7 @@ window.minisite = (function(env) {
 	attempt_load()
 		.then(parse)
 		.then(content => {
-			logger.log('content loaded !', content)
+			logger.log('content loaded and parsed !', content)
 			on_successful_load(content)
 		})
 		.catch(err => {
@@ -233,13 +246,13 @@ window.minisite = (function(env) {
 		}
 	})
 
-	env.wall_check = (lang, password) => {
-		logger.info('chosen lang', lang)
+	env.authentify = (lang, password) => {
+		logger.info('[authentify] chosen lang', lang)
 		state.lang = lang
-		logger.info('checking', password)
+		logger.info('[authentify] checking', password)
 		state.ready_p
 			.then(content => {
-				logger.info('content ready, checking pwd', content.config.password)
+				logger.info('[authentify] content ready, checking pwd', content.config.password)
 				if (password === content.config.password) {
 					on_successful_auth()
 					env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password)
@@ -254,7 +267,7 @@ window.minisite = (function(env) {
 		logger.info('Successful auth !')
 		const el_wall = document.querySelectorAll('#wall')[0]
 		el_wall.style.display = 'none'
-		const el_site = document.querySelectorAll('.delayed-display')
+		const el_site = document.querySelectorAll('.main-delayed')
 		el_site.forEach(el => el.classList.remove('dn'))
 	})
 
@@ -273,6 +286,8 @@ window.minisite = (function(env) {
 			.join('\n')
 		const el_wall_form = document.querySelectorAll('#wall-form')[0]
 		el_wall_form.innerHTML = new_html
+		const el_wall = document.querySelectorAll('.wall-delayed')
+		el_wall.forEach(el => el.classList.remove('dn'))
 	}
 
 	function render_main(content) {
