@@ -1,13 +1,22 @@
 ---
-title.fr:  "Liste de mariage"
-background: "#111111"
-picture: "foo.jpg"
+anchors:
+  en: "Registry"
+  fr: "Liste de mariage"
+background: ""
+picture: "Save0001.png"
 ---
-
-# FOO
+`en`
 
 ## bar
 
 Hello [world](http://www.google.com)
+
+:+1:
+
+`fr`
+
+## barre
+
+Bonjour [monde](http://www.google.com)
 
 :+1:

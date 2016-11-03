@@ -19,6 +19,7 @@ const NEEDED_FILES_FROM_MODULES = [
 	'fullpage.js/dist/jquery.fullpage.css',
 	'flipclock/compiled/flipclock.js',
 	'flipclock/compiled/flipclock.css',
+	'marked/lib/marked.js',
 ]
 
 const MODULES_ROOT = 'node_modules'
@@ -30,7 +31,7 @@ fs.emptyDirSync(CLEAN_THIRD_PARTY_DIR)
 fs.emptyDirSync(DIST_DIR)
 
 fs.ensureDirSync(FLAGS_DIR);
-['svg', 'png'].forEach(type => fs.copySync(
+['svg' /*, 'png'*/].forEach(type => fs.copySync(
 	path.join(MODULES_ROOT, 'region-flags', type),
 	path.join(FLAGS_DIR, type)
 ))

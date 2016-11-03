@@ -1,13 +1,22 @@
 ---
-title.fr:  "Le jour J"
-background: "#111111"
-picture: "foo.jpg"
+anchors:
+  en: "The Day"
+  fr: "Le jour J"
+background: ""
+picture: "Save0001.png"
 ---
-
-# FOO
+`en`
 
 ## bar
 
 Hello [world](http://www.google.com)
+
+:+1:
+
+`fr`
+
+## barre
+
+Bonjour [monde](http://www.google.com)
 
 :+1:

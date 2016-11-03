@@ -1,7 +1,9 @@
 ---
-title.fr:  "Accueil"
-background: "#111111"
-picture: "foo.jpg"
+anchors:
+  en: "Home"
+  fr: "Accueil"
+background: ""
+picture: "Save0001.png"
 ---
 `en`
 
