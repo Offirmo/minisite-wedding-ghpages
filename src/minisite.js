@@ -119,7 +119,7 @@ window.minisite = (function(env) {
 			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
 				${title}
 			</h1>
-			<img src="../content/${picture}" class="">
+			<img src="content/${picture}" class="">
 		</header>
 		<div class="fn fl-ns w-50-ns measure">
 			${marked(markdown)}
