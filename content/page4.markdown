@@ -3,7 +3,7 @@ anchors:
   en: "Stay the WE"
   fr: "Prolonger son WE"
 background: ""
-picture: "Save0001.png"
+picture: "save0001.png"
 ---
 `en`
 

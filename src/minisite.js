@@ -11,7 +11,7 @@ window.minisite = (function(env) {
 			last_successful_password: 'minisite.last_successful_password',
 			last_chosen_lang: 'minisite.last_chosen_lang'
 		},
-		MAX_PAGES: 10,
+		MAX_PAGES: 12,
 		AVAILABLE_UI_LANGUAGES: [ 'en', 'fr' ],
 		DEFAULT_UI_LANG: 'en',
 		NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0]
@@ -45,7 +45,8 @@ window.minisite = (function(env) {
 	}
 
 	// Helper
-	const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
+	//const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
+	const PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] // transpilation has troubles
 
 	////////////////////////////////////
 	let on_successful_load
@@ -101,7 +102,7 @@ window.minisite = (function(env) {
 			<h1 class="f2 f1-ns">${I18N.wall_header[lang]({ bride, groom })}</h1>
 			<h2 class="f3 f2-ns">TODO Lorem ipsum dolor sit amet</h2>
 
-			<div id="countdown" class="dib" style="width: auto; transform: scale(.5);"></div>
+			<!-- <div id="countdown" class="dib" style="width: auto; transform: scale(.5);"></div> -->
 		</div>
 	</article>
 </div>

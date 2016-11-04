@@ -8,7 +8,7 @@ window.minisite = (function (env) {
             last_successful_password: 'minisite.last_successful_password',
             last_chosen_lang: 'minisite.last_chosen_lang'
         },
-        MAX_PAGES: 10,
+        MAX_PAGES: 12,
         AVAILABLE_UI_LANGUAGES: ['en', 'fr'],
         DEFAULT_UI_LANG: 'en',
         NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0]
@@ -46,7 +46,8 @@ window.minisite = (function (env) {
         },
     };
     // Helper
-    var PAGE_ITERATOR = Array(CONSTS.MAX_PAGES).slice().map(function (x, i) { return i; });
+    //const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
+    var PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // transpilation has troubles
     ////////////////////////////////////
     var on_successful_load;
     var on_successful_auth;
@@ -69,7 +70,7 @@ window.minisite = (function (env) {
     }
     function TEMPLATE_FULLPAGE_SPLASH(data) {
         var lang = data.lang, bride = data.bride, groom = data.groom;
-        return "\n<div class=\"section\">\n\t<article class=\"dt w-100\">\n\t\t<div class=\"dtc v-mid tc\">\n\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t<h2 class=\"f3 f2-ns\">TODO Lorem ipsum dolor sit amet</h2>\n\n\t\t\t<div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div>\n\t\t</div>\n\t</article>\n</div>\n";
+        return "\n<div class=\"section\">\n\t<article class=\"dt w-100\">\n\t\t<div class=\"dtc v-mid tc\">\n\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t<h2 class=\"f3 f2-ns\">TODO Lorem ipsum dolor sit amet</h2>\n\n\t\t\t<!-- <div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div> -->\n\t\t</div>\n\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_SECTION(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
@@ -80,7 +81,7 @@ window.minisite = (function (env) {
     }
     ////////////////////////////////////
     var logger = console;
-    logger.log('constants', CONSTS);
+    logger.log('constants', CONSTS, PAGE_ITERATOR);
     var pegasus = env.pegasus; // TODO use fetch
     if (!pegasus)
         state.errors.push('Expected lib "pegasus" not found !');

@@ -3,7 +3,7 @@ anchors:
   en: "Contact"
   fr: "Contact"
 background: ""
-picture: "Save0001.png"
+picture: "save0001.png"
 ---
 `en`
 

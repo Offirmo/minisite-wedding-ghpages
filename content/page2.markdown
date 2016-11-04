@@ -3,7 +3,7 @@ anchors:
   en: "Venue"
   fr: "Comment venir ?"
 background: ""
-picture: "Save0001.png"
+picture: "save0001.png"
 ---
 `en`
 

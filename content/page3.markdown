@@ -3,7 +3,7 @@ anchors:
   en: "The Day"
   fr: "Le jour J"
 background: ""
-picture: "Save0001.png"
+picture: "save0001.png"
 ---
 `en`
 
