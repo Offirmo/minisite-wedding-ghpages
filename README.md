@@ -7,13 +7,24 @@ EXPERIMENTAL
 * editable and configurable by non-tech people
 
 
-
 ## Install
-Just clone this repo and activate github-pages.
+1. Create a dedicated organisation. Reasons:
+  * to better control the domain name
+  * to be able to have multiple collaborators (copy writing)
+2. clone this repo in the new organisation
+3. activate github-pages for the new repo
 
 
-## Inspiration
+## Usage
+Edit the files in the `content` directory
+
+
+## Troubleshooting
+...
+
+## Inspiration and hat tips
 https://app.ewedding.com/demo?theme=candy
+
 
 ## Contributing
 See CONTRIBUTING.md
