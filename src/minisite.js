@@ -147,7 +147,7 @@ window.minisite = (function(env) {
 
 	////////////////////////////////////
 	const logger = console
-	logger.log('constants', CONSTS)
+	logger.log('constants', CONSTS, PAGE_ITERATOR)
 
 	const pegasus = env.pegasus // TODO use fetch
 	if (! pegasus) state.errors.push('Expected lib "pegasus" not found !')
