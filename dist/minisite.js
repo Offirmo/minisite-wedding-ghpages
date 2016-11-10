@@ -317,7 +317,8 @@ window.minisite = (function (env) {
         el_wall.style.display = 'none';
         var el_site = document.querySelectorAll('.main-delayed');
         polyfill_forEach_if_missing_on(el_site);
-        el_site.forEach(function (el) { return el.classList.remove('dn'); });
+        el_site.forEach(function (el) { if (el.classList)
+            el.classList.remove('dn'); });
     });
     function render_wall(content, state) {
         var languages = content.config.languages;
@@ -335,7 +336,8 @@ window.minisite = (function (env) {
         el_wall_form.innerHTML = new_html;
         var el_wall = document.querySelectorAll('.wall-delayed');
         polyfill_forEach_if_missing_on(el_wall);
-        el_wall.forEach(function (el) { return el.classList.remove('dn'); });
+        el_wall.forEach(function (el) { if (el.classList)
+            el.classList.remove('dn'); });
     }
     function render_menu(content, state) {
         var new_html = content.pages.map(function (page, i) {
