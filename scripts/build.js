@@ -21,6 +21,8 @@ const NEEDED_FILES_FROM_MODULES = [
 	'flipclock/compiled/flipclock.js',
 	'flipclock/compiled/flipclock.css',
 	'marked/lib/marked.js',
+	'leaflet/dist/leaflet.css',
+	'leaflet/dist/leaflet.js',
 ]
 
 const MODULES_ROOT = 'node_modules'

@@ -22,24 +22,19 @@
 	<script src="third-party/flipclock@0.js"></script>
 	<link rel="stylesheet" type="text/css" href="third-party/flipclock@0.css" />
 	<script src="third-party/marked@0.js"></script>
+	<link rel="stylesheet" type="text/css" href="third-party/leaflet@1.css" />
+	<script src="third-party/leaflet@1.js"></script>
 
 	<script src="src/minisite.js"></script>
 
 	<!-- <xlink rel="stylesheet" href="node_modules/tachyons-debug/css/tachyons-debug.css"/> -->
 
 	<style type="text/css">
-		/* https://fonts.googleapis.com/css?family=Buenard&subset=latin-ext */
-		/* latin-ext */
-		@font-face {
-			font-family: 'Buenard';
-			font-style: normal;
-			font-weight: 400;
-			src: local('Buenard'), local('Buenard-Regular'), url(content/Buenard-Regular.ttf) format('ttf');
-			unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-		}
+		@import url('https://fonts.googleapis.com/css?family=Buenard&subset=latin-ext');
+		@import url('https://fonts.googleapis.com/css?family=Open+Sans&subset=latin-ext');
 
 		body {
-			font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+			font-family: 'Open Sans', sans-serif;
 			background-color: #ffffff;
 			background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
 		}
@@ -52,8 +47,12 @@
 			line-height: 1.5em;
 		}
 		#fullpage h1,
-		#fullpage h2 {
+		#fullpage h2,
+		#fullpage h3 {
 			font-family: 'Buenard', serif;
+		}
+		#fullpage h3 {
+			font-size: 1.7em;
 		}
 
 		.mw6-5 {
