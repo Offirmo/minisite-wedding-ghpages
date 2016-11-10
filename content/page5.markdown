@@ -1,8 +1,9 @@
 ---
-anchors:
+anchor:
   en: "Registry"
   fr: "Liste de mariage"
 background: ""
+layout: default
 picture: "save0001.png"
 ---
 `en`

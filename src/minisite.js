@@ -2,6 +2,74 @@
 
 console.log('Hello from minisite.js')
 
+// for IE
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+// Production steps of ECMA-262, Edition 5, 15.4.4.18
+// Reference: http://es5.github.io/#x15.4.4.18
+function polyfill_forEach_if_missing_on(x) {
+	if (x.forEach) return
+
+	x.forEach = function(callback, thisArg) {
+
+		var T, k;
+
+		if (this === null) {
+			throw new TypeError(' this is null or not defined');
+		}
+
+		// 1. Let O be the result of calling toObject() passing the
+		// |this| value as the argument.
+		var O = Object(this);
+
+		// 2. Let lenValue be the result of calling the Get() internal
+		// method of O with the argument "length".
+		// 3. Let len be toUint32(lenValue).
+		var len = O.length >>> 0;
+
+		// 4. If isCallable(callback) is false, throw a TypeError exception.
+		// See: http://es5.github.com/#x9.11
+		if (typeof callback !== "function") {
+			throw new TypeError(callback + ' is not a function');
+		}
+
+		// 5. If thisArg was supplied, let T be thisArg; else let
+		// T be undefined.
+		if (arguments.length > 1) {
+			T = thisArg;
+		}
+
+		// 6. Let k be 0
+		k = 0;
+
+		// 7. Repeat, while k < len
+		while (k < len) {
+
+			var kValue;
+
+			// a. Let Pk be ToString(k).
+			//    This is implicit for LHS operands of the in operator
+			// b. Let kPresent be the result of calling the HasProperty
+			//    internal method of O with argument Pk.
+			//    This step can be combined with c
+			// c. If kPresent is true, then
+			if (k in O) {
+
+				// i. Let kValue be the result of calling the Get internal
+				// method of O with argument Pk.
+				kValue = O[k];
+
+				// ii. Call the Call internal method of callback with T as
+				// the this value and argument list containing kValue, k, and O.
+				callback.call(T, kValue, k, O);
+			}
+			// d. Increase k by 1.
+			k++;
+		}
+		// 8. return undefined
+	};
+}
+polyfill_forEach_if_missing_on(Array.prototype)
+
 window.minisite = (function(env) {
 	'use strict';
 
@@ -14,7 +82,8 @@ window.minisite = (function(env) {
 		MAX_PAGES: 12,
 		AVAILABLE_UI_LANGUAGES: [ 'en', 'fr' ],
 		DEFAULT_UI_LANG: 'en',
-		NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0]
+		NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0],
+		NOT_SMALL_WIDTH_PX: 480, // tachyons "not small" breakpoint, experimentally measured
 	}
 
 	const I18N = {
@@ -150,18 +219,23 @@ window.minisite = (function(env) {
 	const logger = console
 	logger.log('constants', CONSTS, PAGE_ITERATOR)
 
-	const pegasus = env.pegasus // TODO use fetch
-	if (! pegasus) state.errors.push('Expected lib "pegasus" not found !')
-
 	const marked = env.marked
 	if (! marked) state.errors.push('Expected lib "marked" not found !')
 
 	////////////////////////////////////
 
 	function fetch_raw_file(url, required = false) {
+
+		const p = Promise.resolve($.ajax({
+				url,
+				dataType: 'text',
+			}))
+			.catch((jqXHR, textStatus, errorThrown) => { throw errorThrown }) // fix bad catch call
+
+		/*
 		// turn pegasus into real promise
 		const p = new Promise((resolve, reject) => pegasus(url).then((x, xhr) => resolve(xhr.responseText), reject))
-
+		*/
 		return p
 			.catch(e => {
 				e = e || new Error('unknown error')
@@ -320,7 +394,7 @@ window.minisite = (function(env) {
 		})
 
 	state.ready_p.then(() => logger.log('content is ready !'))
-	state.ready_p.then(data => render(data, state))
+	state.ready_p.then(data => render(data, state)).catch(e => console.error('rendering error', e))
 	state.ready_p.then(function attempt_auto_auth(content) {
 		const last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password)
 		if (!last_successful_password) return
@@ -356,6 +430,7 @@ window.minisite = (function(env) {
 		const el_wall = document.querySelectorAll('#wall')[0]
 		el_wall.style.display = 'none'
 		const el_site = document.querySelectorAll('.main-delayed')
+		polyfill_forEach_if_missing_on(el_site)
 		el_site.forEach(el => el.classList.remove('dn'))
 	})
 
@@ -375,6 +450,7 @@ window.minisite = (function(env) {
 		const el_wall_form = document.querySelectorAll('#wall-form')[0]
 		el_wall_form.innerHTML = new_html
 		const el_wall = document.querySelectorAll('.wall-delayed')
+		polyfill_forEach_if_missing_on(el_wall)
 		el_wall.forEach(el => el.classList.remove('dn'))
 	}
 
@@ -382,7 +458,7 @@ window.minisite = (function(env) {
 		const new_html =  content.pages.map((page, i) => {
 				return TEMPLATE_ANCHOR({
 					page_id: i + 1,
-					anchor: page.meta.anchors[state.lang],
+					anchor: page.meta.anchor[state.lang],
 				})
 			})
 			.join('\n')
@@ -415,25 +491,31 @@ window.minisite = (function(env) {
 		render_menu(content, state)
 		render_pages(content, state)
 
-		$('#fullpage').fullpage({
-			sectionsColor: content.pages.map((page, i) => page.meta.background),
-			anchors: content.pages.map((page, i) => `page${i+1}`),
-			menu: '#fp-menu',
-			paddingTop: '48px',
-			bigSectionsDestination: 'top',
-			//scrollBar: true,
-			scrollOverflow: true
-		})
+		// need a small timeout to let the DOM reflow before
+		// 1) scrollOverflow does calculations
+		// 2) fullpage attempt to scroll to required page (url options)
+		setTimeout(() => {
+			$('#fullpage').fullpage({
+				sectionsColor: content.pages.map((page, i) => page.meta.background),
+				anchors: content.pages.map((page, i) => `page${i+1}`),
+				menu: '#fp-menu',
+				paddingTop: '48px',
+				bigSectionsDestination: 'top',
+				//scrollBar: $(window).width() > CONSTS.NOT_SMALL_WIDTH_PX,
+				scrollOverflow: $(window).width() > CONSTS.NOT_SMALL_WIDTH_PX,
+				responsiveWidth: 480,
+			})
 
-		// countdown to ; month starts at 0
-		var date  = new Date(Date.UTC(2017, 6, 1, 16, 0, 0));
-		var now   = new Date();
-		var diff  = date.getTime()/1000 - now.getTime()/1000;
-		$('#countdown').FlipClock(diff, {
-			clockFace: 'DailyCounter',
-			countdown: true,
-			language: 'fr'
-		})
+			// countdown to ; month starts at 0
+			var date  = new Date(Date.UTC(2017, 6, 1, 16, 0, 0));
+			var now   = new Date();
+			var diff  = date.getTime()/1000 - now.getTime()/1000;
+			$('#countdown').FlipClock(diff, {
+				clockFace: 'DailyCounter',
+				countdown: true,
+				language: 'fr'
+			})
+		}, 25)
 	}
 
 	function render(data) {

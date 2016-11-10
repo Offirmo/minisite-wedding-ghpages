@@ -1,8 +1,9 @@
 ---
-anchors:
+anchor:
   en: "Stay the WE"
   fr: "Prolonger son WE"
 background: ""
+layout: default
 picture: "save0001.png"
 ---
 `en`

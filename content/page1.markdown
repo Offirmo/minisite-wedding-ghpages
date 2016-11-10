@@ -1,8 +1,9 @@
 ---
-anchors:
+anchor:
   en: "Home"
   fr: "Accueil"
 background: ""
+layout: home
 picture: "save0001.png"
 ---
 `en`

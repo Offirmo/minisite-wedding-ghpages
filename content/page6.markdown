@@ -1,8 +1,9 @@
 ---
-anchors:
+anchor:
   en: "Contact"
   fr: "Contact"
 background: ""
+layout: contact
 picture: "save0001.png"
 ---
 `en`

@@ -1,8 +1,9 @@
 ---
-anchors:
+anchor:
   en: "The Day"
   fr: "Le jour J"
 background: ""
+layout: default
 picture: "save0001.png"
 ---
 `en`

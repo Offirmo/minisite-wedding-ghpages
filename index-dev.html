@@ -11,7 +11,8 @@
 	<title>TODO TITLE</title>
 	<link rel="icon" href="content/favicon.png" type="image/png" />
 
-	<script src="third-party/pegasus@0.js"></script>
+	<script src="third-party/console-polyfill.index@0.js"></script>
+	<script src="third-party/core.shim.min@2.js"></script>
 	<link rel="stylesheet" type="text/css" href="third-party/tachyons.min@4.css" />
 	<script src="third-party/js-yaml@3.js"></script>
 	<script src="third-party/jquery@3.js"></script>
@@ -27,11 +28,34 @@
 	<!-- <xlink rel="stylesheet" href="node_modules/tachyons-debug/css/tachyons-debug.css"/> -->
 
 	<style type="text/css">
+		/* https://fonts.googleapis.com/css?family=Buenard&subset=latin-ext */
+		/* latin-ext */
+		@font-face {
+			font-family: 'Buenard';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Buenard'), local('Buenard-Regular'), url(content/Buenard-Regular.ttf) format('ttf');
+			unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+		}
+
 		body {
 			font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 			background-color: #ffffff;
 			background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
 		}
+
+		#fullpage {
+			font-family: 'Buenard', serif;
+		}
+		#fullpage p {
+			font-size: 1.3em;
+			line-height: 1.5em;
+		}
+		#fullpage h1,
+		#fullpage h2 {
+			font-family: 'Buenard', serif;
+		}
+
 		.mw6-5 {
 			/* for the login screen */
 			max-width: 34rem

@@ -10,7 +10,8 @@ const fs = require('@offirmo/cli-toolbox/fs/extra')
 
 const NEEDED_FILES_FROM_MODULES = [
 	// order matters !
-	'@typicode/pegasus/dist/pegasus.js',
+	'console-polyfill/index.js',
+	'core-js/client/shim.min.js',
 	'tachyons/css/tachyons.min.css',
 	'js-yaml/dist/js-yaml.js',
 	'jquery/dist/jquery.js',
@@ -37,6 +38,19 @@ fs.ensureDirSync(FLAGS_DIR);
 ))
 
 let header_deps = ''
+
+/*
+require('core-js-builder')({
+	modules: ['es6.promise.'], // modules / namespaces
+	blacklist: [],    // blacklist of modules / namespaces, by default - empty list
+}).then(code => {
+	fs.outputFileSync(`${CLEAN_THIRD_PARTY_DIR}/custom-core-js-polyfill.js`, code)
+})*/
+/*var polyfiller = new (require('polyfiller'));
+var list = polyfiller.find([ 'Promise', 'String.prototype.includes' ]);
+fs.outputFileSync(`${CLEAN_THIRD_PARTY_DIR}/custom-polyfill-by-polyfiller.js`, polyfiller.pack(list));
+header_deps += `\n<script src="${CLEAN_THIRD_PARTY_DIR}/custom-polyfill-by-polyfiller.js"></script>`
+*/
 
 NEEDED_FILES_FROM_MODULES.forEach(dep_path => {
 	const module = dep_path.startsWith('@') ? dep_path.split('/').slice(0, 2).join('/') : dep_path.split('/')[0]
