@@ -21,3 +21,6 @@ http://stackoverflow.com/questions/33288286/fullpage-js-and-mobile-devices-how-t
 - pics
 - backgrounds
 - photos
+
+
+browser-sync start --server --files "dist" "content" "src"

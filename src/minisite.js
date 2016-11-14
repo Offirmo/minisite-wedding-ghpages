@@ -115,7 +115,7 @@ window.minisite = (function(env) {
 
 	// Helper
 	//const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
-	const PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] // transpilation has troubles
+	const PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] // transpilation has troubles with previous line ;)
 
 	////////////////////////////////////
 	let on_successful_load
@@ -161,7 +161,7 @@ window.minisite = (function(env) {
 	`
 	}
 
-	function TEMPLATE_FULLPAGE_SPLASH(data) {
+	function TEMPLATE_FULLPAGE_SECTION_HOME(data) {
 		const { lang, bride, groom } = data
 
 		return `
@@ -178,7 +178,7 @@ window.minisite = (function(env) {
 `
 	}
 
-	function TEMPLATE_FULLPAGE_SECTION(data) {
+	function TEMPLATE_FULLPAGE_SECTION_DEFAULT(data) {
 		const { title, picture, markdown } = data
 
 		return `
@@ -212,8 +212,6 @@ window.minisite = (function(env) {
 </div>
 `
 	}
-
-
 
 	////////////////////////////////////
 	const logger = console
@@ -402,6 +400,7 @@ window.minisite = (function(env) {
 		logger.info('attempting auto-auth...')
 		if (last_successful_password === content.config.password) {
 			state.lang = env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang)
+			console.info(CONSTS.LS_KEYS.last_chosen_lang, env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang))
 			on_successful_auth()
 		}
 	})
@@ -469,9 +468,9 @@ window.minisite = (function(env) {
 
 	function render_pages(content, state) {
 		const new_html =  [
-				TEMPLATE_FULLPAGE_SPLASH(Object.assign({}, content.config, {lang: state.lang})),
+				TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, content.config, {lang: state.lang})),
 				...content.pages.slice(1).map((page, i) => {
-					return TEMPLATE_FULLPAGE_SECTION({
+					return TEMPLATE_FULLPAGE_SECTION_DEFAULT({
 						title: page.content[state.lang].title,
 						markdown: page.content[state.lang].text,
 						picture: page.meta.picture,
@@ -522,6 +521,8 @@ window.minisite = (function(env) {
 		logger.log('Rendering...')
 
 		// choose best language
+		logger.log('choosing lang', data.config.languages, state.lang, CONSTS.NAVIGATOR_LANG, CONSTS.DEFAULT_UI_LANG)
+
 		const best_auto_lang = data.config.languages.includes(CONSTS.NAVIGATOR_LANG) ? CONSTS.NAVIGATOR_LANG : CONSTS.DEFAULT_UI_LANG
 		logger.log('best_auto_lang', best_auto_lang)
 		state.lang = state.lang || best_auto_lang || 'en'

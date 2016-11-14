@@ -103,7 +103,7 @@ window.minisite = (function (env) {
     };
     // Helper
     //const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
-    var PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // transpilation has troubles
+    var PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // transpilation has troubles with previous line ;)
     ////////////////////////////////////
     var on_successful_load;
     var on_successful_auth;
@@ -124,11 +124,11 @@ window.minisite = (function (env) {
         var page_id = data.page_id, anchor = data.anchor;
         return "\n<a class=\"link near-black dib mr3 mr4-ns\" href=\"#page" + page_id + "\">" + anchor + "</a>\n\t";
     }
-    function TEMPLATE_FULLPAGE_SPLASH(data) {
+    function TEMPLATE_FULLPAGE_SECTION_HOME(data) {
         var lang = data.lang, bride = data.bride, groom = data.groom;
         return "\n<div class=\"section\">\n\t<article class=\"dt w-100\">\n\t\t<div class=\"dtc v-mid tc\">\n\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t<h2 class=\"f3 f2-ns\">TODO Lorem ipsum dolor sit amet</h2>\n\n\t\t\t<!-- <div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div> -->\n\t\t</div>\n\t</article>\n</div>\n";
     }
-    function TEMPLATE_FULLPAGE_SECTION(data) {
+    function TEMPLATE_FULLPAGE_SECTION_DEFAULT(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
         return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center mw60em\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns measure\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
@@ -291,6 +291,7 @@ window.minisite = (function (env) {
         logger.info('attempting auto-auth...');
         if (last_successful_password === content.config.password) {
             state.lang = env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang);
+            console.info(CONSTS.LS_KEYS.last_chosen_lang, env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang));
             on_successful_auth();
         }
     });
@@ -352,9 +353,9 @@ window.minisite = (function (env) {
     }
     function render_pages(content, state) {
         var new_html = [
-            TEMPLATE_FULLPAGE_SPLASH(Object.assign({}, content.config, { lang: state.lang }))
+            TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, content.config, { lang: state.lang }))
         ].concat(content.pages.slice(1).map(function (page, i) {
-            return TEMPLATE_FULLPAGE_SECTION({
+            return TEMPLATE_FULLPAGE_SECTION_DEFAULT({
                 title: page.content[state.lang].title,
                 markdown: page.content[state.lang].text,
                 picture: page.meta.picture,
@@ -397,6 +398,7 @@ window.minisite = (function (env) {
     function render(data) {
         logger.log('Rendering...');
         // choose best language
+        logger.log('choosing lang', data.config.languages, state.lang, CONSTS.NAVIGATOR_LANG, CONSTS.DEFAULT_UI_LANG);
         var best_auto_lang = data.config.languages.includes(CONSTS.NAVIGATOR_LANG) ? CONSTS.NAVIGATOR_LANG : CONSTS.DEFAULT_UI_LANG;
         logger.log('best_auto_lang', best_auto_lang);
         state.lang = state.lang || best_auto_lang || 'en';
