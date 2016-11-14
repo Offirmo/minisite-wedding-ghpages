@@ -121,6 +121,15 @@ window.minisite = (function (env) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
         return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center mw60em\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns measure\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
+    function TEMPLATE_FULLPAGE_SECTION_MAP(data) {
+        var title = data.title, container_id = data.container_id, picture = data.picture, markdown = data.markdown;
+        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center mw60em\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns measure\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<div id=\"" + container_id + "\" style=\"height: 360px; width: 100%;\"></div>\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
+        /*
+         <div style="height: 360px; width: 100%; overflow: hidden;">
+         <div id="${container_id}" style="height: 360px; width: 600px;"></div>
+         </div>
+         */
+    }
     function TEMPLATE_FULLPAGE_FOOTER(lang) {
         // TODO localize
         return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a href=\"/language/\"        title=\"Language\" class=\"f6 dib ph2 link mid-gray dim\">Language</a>\n\t\t\t<a href=\"/terms/\"            title=\"Legal\" class=\"f6 dib ph2 link mid-gray dim\">Legal stuff</a>\n\t\t\t<a href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" class=\"f6 dib ph2 link mid-gray dim\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
@@ -145,6 +154,9 @@ window.minisite = (function (env) {
     var storage = env.localStorage;
     if (!jsyaml)
         report_error_msg('Expected API "localStorage" not found !');
+    var leaflet = env.L;
+    if (!leaflet)
+        report_error_msg('Expected lib "leaflet" not found !');
     //////////// SERVICES ////////////
     var PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // transpilation has troubles with more "clever" writings :/
     // Fetch given file or reject. Resolve with null if 404 and !expected
@@ -221,6 +233,10 @@ window.minisite = (function (env) {
         p.then(function (d) { return logger.log('* promised "' + target + '" ✓', d); }, function (err) { return logger.error('! promised "' + target + '" ❌', err); });
     }
     //////////// RENDERING ////////////
+    function get_unique_section_container_id(section_number, sub_container) {
+        if (sub_container === void 0) { sub_container = ''; }
+        return "section" + section_number + "-container" + (sub_container ? "-" + sub_container : '');
+    }
     function render_wall(config) {
         logger.groupCollapsed('rendering wall...');
         logger.log(config);
@@ -265,25 +281,76 @@ window.minisite = (function (env) {
     }
     function render_pages(config, pages, lang) {
         logger.log("rendering pages...", { config: config, pages: pages, lang: lang });
-        var new_html = [
-            TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, config, { lang: lang }))
-        ].concat(pages.slice(1).map(function (page, i) {
-            return TEMPLATE_FULLPAGE_SECTION_DEFAULT({
+        var templates_by_layout = {
+            home: TEMPLATE_FULLPAGE_SECTION_HOME,
+            map: TEMPLATE_FULLPAGE_SECTION_MAP,
+            default: TEMPLATE_FULLPAGE_SECTION_DEFAULT,
+        };
+        var new_html = pages.map(function (page, i) {
+            var layout = templates_by_layout[page.meta.layout] ? page.meta.layout : 'default'; // TODO check
+            return templates_by_layout[layout]({
+                lang: lang,
+                bride: config.bride,
+                groom: config.groom,
                 title: page.content[lang].title,
                 markdown: page.content[lang].text,
                 picture: page.meta.picture,
+                container_id: get_unique_section_container_id(i),
             });
-        }), [
+        }).concat([
             TEMPLATE_FULLPAGE_FOOTER()
         ]).join('\n');
         var el_fullpage = document.querySelectorAll('#fullpage')[0];
         el_fullpage.innerHTML = new_html;
+    }
+    function render_maps(pages, config) {
+        logger.log("rendering maps...", { pages: pages, config: config });
+        pages.forEach(function (page, index) {
+            if (page.meta.layout !== 'map')
+                return;
+            var container_id = get_unique_section_container_id(index);
+            logger.log("map container id =", container_id);
+            var leaflet_map = leaflet.map(container_id);
+            leaflet_map.setView([51.505, -0.09], 13);
+            leaflet.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                    '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                id: 'mapbox.streets'
+            }).addTo(leaflet_map);
+            var marker = leaflet.marker([51.5, -0.09]).addTo(leaflet_map);
+            /*
+            var circle = L.circle([51.508, -0.11], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 500
+            }).addTo(mymap);
+
+            var polygon = L.polygon([
+                [51.509, -0.08],
+                [51.503, -0.06],
+                [51.51, -0.047]
+            ]).addTo(mymap);
+
+            marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+            circle.bindPopup("I am a circle.");
+            polygon.bindPopup("I am a polygon.");
+
+            var popup = L.popup()
+                .setLatLng([51.5, -0.09])
+                .setContent("I am a standalone popup.")
+                .openOn(mymap);
+                */
+        });
     }
     function render_main(config, pages, lang) {
         logger.groupCollapsed('rendering main...');
         logger.log({ config: config, pages: pages, lang: lang });
         render_menu(pages, lang);
         render_pages(config, pages, lang);
+        render_maps(pages, config);
         // need a small timeout to let the DOM reflow before
         // 1) scrollOverflow does calculations
         // 2) fullpage attempt to scroll to required page (url options)

@@ -184,6 +184,32 @@ window.minisite = (function(env) {
 `
 	}
 
+	function TEMPLATE_FULLPAGE_SECTION_MAP(data) {
+		const { title, container_id, picture, markdown } = data
+
+		return `
+<div class="section">
+	<article class="cf ph3 ph5-ns pv3 center mw60em">
+		<header class="fn fl-ns w-50-ns pr4-ns measure">
+			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
+				${title}
+			</h1>
+			<div id="${container_id}" style="height: 360px; width: 100%;"></div>
+		</header>
+		<div class="fn fl-ns w-50-ns measure">
+			${marked(markdown)}
+		</div>
+	</article>
+</div>
+`
+
+		/*
+		 <div style="height: 360px; width: 100%; overflow: hidden;">
+		 <div id="${container_id}" style="height: 360px; width: 600px;"></div>
+		 </div>
+		 */
+	}
+
 	function TEMPLATE_FULLPAGE_FOOTER(lang) {
 		// TODO localize
 		return `
@@ -223,6 +249,9 @@ window.minisite = (function(env) {
 
 	const storage = env.localStorage
 	if (! jsyaml) report_error_msg('Expected API "localStorage" not found !')
+
+	const leaflet = env.L
+	if (! leaflet) report_error_msg('Expected lib "leaflet" not found !')
 
 	//////////// SERVICES ////////////
 
@@ -320,6 +349,10 @@ window.minisite = (function(env) {
 
 	//////////// RENDERING ////////////
 
+	function get_unique_section_container_id(section_number, sub_container = '') {
+		return `section${section_number}-container${sub_container ? `-${sub_container}` : ''}`
+	}
+
 	function render_wall(config) {
 		logger.groupCollapsed('rendering wall...')
 		logger.log(config)
@@ -373,13 +406,22 @@ window.minisite = (function(env) {
 	function render_pages(config, pages, lang) {
 		logger.log(`rendering pages...`, {config, pages, lang})
 
-		const new_html =  [
-				TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, config, {lang})),
-				...pages.slice(1).map((page, i) => {
-					return TEMPLATE_FULLPAGE_SECTION_DEFAULT({
+		const templates_by_layout = {
+			home: TEMPLATE_FULLPAGE_SECTION_HOME,
+			map: TEMPLATE_FULLPAGE_SECTION_MAP,
+			default: TEMPLATE_FULLPAGE_SECTION_DEFAULT,
+		}
+		const new_html = [
+				...pages.map((page, i) => {
+					const layout = templates_by_layout[page.meta.layout] ? page.meta.layout : 'default' // TODO check
+					return templates_by_layout[layout]({
+						lang,
+						bride: config.bride,
+						groom: config.groom,
 						title: page.content[lang].title,
 						markdown: page.content[lang].text,
 						picture: page.meta.picture,
+						container_id: get_unique_section_container_id(i),
 					})
 				}),
 				TEMPLATE_FULLPAGE_FOOTER()
@@ -390,12 +432,61 @@ window.minisite = (function(env) {
 		el_fullpage.innerHTML = new_html
 	}
 
+	function render_maps(pages, config) {
+		logger.log(`rendering maps...`, {pages, config})
+
+		pages.forEach((page, index) => {
+			if (page.meta.layout !== 'map') return
+
+			const container_id = get_unique_section_container_id(index)
+			logger.log(`map container id =`, container_id)
+
+			const leaflet_map = leaflet.map(container_id)
+			leaflet_map.setView([51.505, -0.09], 13);
+
+			leaflet.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+				maxZoom: 18,
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				id: 'mapbox.streets'
+			}).addTo(leaflet_map);
+
+			const marker = leaflet.marker([51.5, -0.09]).addTo(leaflet_map);
+
+			/*
+			var circle = L.circle([51.508, -0.11], {
+				color: 'red',
+				fillColor: '#f03',
+				fillOpacity: 0.5,
+				radius: 500
+			}).addTo(mymap);
+
+			var polygon = L.polygon([
+				[51.509, -0.08],
+				[51.503, -0.06],
+				[51.51, -0.047]
+			]).addTo(mymap);
+
+			marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+			circle.bindPopup("I am a circle.");
+			polygon.bindPopup("I am a polygon.");
+
+			var popup = L.popup()
+				.setLatLng([51.5, -0.09])
+				.setContent("I am a standalone popup.")
+				.openOn(mymap);
+				*/
+		})
+	}
+
 	function render_main(config, pages, lang) {
 		logger.groupCollapsed('rendering main...')
 		logger.log({config, pages, lang})
 
 		render_menu(pages, lang)
 		render_pages(config, pages, lang)
+		render_maps(pages, config)
 
 		// need a small timeout to let the DOM reflow before
 		// 1) scrollOverflow does calculations
@@ -423,6 +514,7 @@ window.minisite = (function(env) {
 				countdown: true,
 				language: 'fr'
 			})
+
 		}, 25)
 
 		logger.groupEnd()

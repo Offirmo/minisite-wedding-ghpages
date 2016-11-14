@@ -29,6 +29,7 @@ const MODULES_ROOT = 'node_modules'
 const CLEAN_THIRD_PARTY_DIR = 'third-party'
 const DIST_DIR = 'dist'
 const FLAGS_DIR = path.join(CLEAN_THIRD_PARTY_DIR, 'flags')
+const LEAFLET_IMAGES_DIR = path.join(CLEAN_THIRD_PARTY_DIR, 'images')
 
 fs.emptyDirSync(CLEAN_THIRD_PARTY_DIR)
 fs.emptyDirSync(DIST_DIR)
@@ -38,6 +39,11 @@ fs.ensureDirSync(FLAGS_DIR);
 	path.join(MODULES_ROOT, 'region-flags', type),
 	path.join(FLAGS_DIR, type)
 ))
+
+fs.copySync(
+	path.join(MODULES_ROOT, 'leaflet', 'dist', 'images'),
+	LEAFLET_IMAGES_DIR
+)
 
 let header_deps = ''
 
