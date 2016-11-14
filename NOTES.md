@@ -12,15 +12,16 @@ Promise.resolve($.getJSON('/path/to/my/api'))
 
 TODO
 - ☑ fullpage mobile
-http://alvarotrigo.com/fullPage/examples/responsive.html#firstPage
-http://stackoverflow.com/questions/33288286/fullpage-js-and-mobile-devices-how-to-enable-section-slide-switch-if-content
-- intro
-- layouts
-- maps
-- contact
-- pics
-- backgrounds
-- photos
+  http://alvarotrigo.com/fullPage/examples/responsive.html#firstPage
+  http://stackoverflow.com/questions/33288286/fullpage-js-and-mobile-devices-how-to-enable-section-slide-switch-if-content
+- ☐ intro
+- ☐ layouts
+- ☐ maps
+- ☐ contact
+- ☐ pics by Chloe
+- ☐ backgrounds
+- ☐ photos
+  http://photoswipe.com/
 
 
 browser-sync start --server --files "dist" "content" "src"

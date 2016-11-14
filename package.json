@@ -33,6 +33,6 @@
     "region-flags": "^1.0.1",
     "semver": "^5.3.0",
     "tachyons-debug": "^1.1.9",
-    "typescript": "^2.1.1"
+    "typescript": "^2.0.9"
   }
 }
