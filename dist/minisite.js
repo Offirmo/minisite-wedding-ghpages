@@ -1,5 +1,5 @@
 "use strict";
-console.log('Hello from minisite.js');
+console.log('Hello from minisite.js !');
 // for IE
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
 // Production steps of ECMA-262, Edition 5, 15.4.4.18
@@ -57,17 +57,20 @@ function polyfill_forEach_if_missing_on(x) {
 polyfill_forEach_if_missing_on(Array.prototype);
 window.minisite = (function (env) {
     'use strict';
-    ////////////////////////////////////
+    //////////// CONSTANTS ////////////
     var CONSTS = {
         LS_KEYS: {
+            last_successful_raw_config: 'minisite.last_successful_raw_config',
+            last_successful_raw_pages: 'minisite.last_successful_raw_pages',
             last_successful_password: 'minisite.last_successful_password',
             last_chosen_lang: 'minisite.last_chosen_lang'
         },
         MAX_PAGES: 12,
         AVAILABLE_UI_LANGUAGES: ['en', 'fr'],
         DEFAULT_UI_LANG: 'en',
-        NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0],
+        NAVIGATOR_LANG: (env.navigator.userLanguage || env.navigator.language || 'en').split('-')[0],
         NOT_SMALL_WIDTH_PX: 480,
+        REPO_URL: 'https://github.com/Offirmo/minisite-w',
     };
     var I18N = {
         svg_flag: {
@@ -101,24 +104,10 @@ window.minisite = (function (env) {
             fr: 'Entrer',
         },
     };
-    // Helper
-    //const PAGE_ITERATOR = [...Array(CONSTS.MAX_PAGES)].map((x, i) => i)
-    var PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // transpilation has troubles with previous line ;)
-    ////////////////////////////////////
-    var on_successful_load;
-    var on_successful_auth;
-    var state = {
-        is_ready: false,
-        ready_p: new Promise(function (resolve) { return on_successful_load = resolve; }),
-        is_authentified: false,
-        authentified_p: new Promise(function (resolve) { return on_successful_auth = resolve; }),
-        lang: undefined,
-        errors: [],
-    };
-    ////////////////////////////////////
+    //////////// TEMPLATES ////////////
     function TEMPLATE_WALL(data) {
         var lang = data.lang, bride = data.bride, groom = data.groom;
-        return "\n<div class=\"br2-ns bb ba-ns br2-ns b--black-10 bg-white-80 mv3-ns w-100 mw6-5 center\">\n\t<div class=\"ph3\">\n\t\t<h2 class=\"mv2\"><img src=\"" + I18N.svg_flag[lang] + "\" class=\"v-base mr2\" width=\"26\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h2>\n\t\t<p class=\"f6\">" + I18N.wall_text[lang] + "</p>\n\t\t<p>\n\t\t<form onSubmit=\"authentify(this.elements[0].value, this.elements[1].value), false\">\n\t\t\t<label for=\"mdpInput\">" + I18N.wall_password_label[lang] + "</label>\n\t\t\t<input id=\"langInput\" class=\"dn\" value=\"" + lang + "\" />\n\t\t\t<input id=\"mdpInput\" class=\"input-reset mw3\" placeholder=\"" + I18N.wall_password_placeholder[lang] + "\" />\n\t\t\t<button type=\"submit\" class=\"button-reset\">" + I18N.wall_password_cta[lang] + "</button>\n\t\t</form>\n\t\t</p>\n\t</div>\n</div>\n\t";
+        return "\n<div class=\"br2-ns bb ba-ns br2-ns b--black-10 bg-white-80 mv3-ns w-100 mw6-5 center\">\n\t<div class=\"ph3\">\n\t\t<h2 class=\"mv2\"><img src=\"" + I18N.svg_flag[lang] + "\" class=\"v-base mr2\" width=\"26\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h2>\n\t\t<p class=\"f6\">" + I18N.wall_text[lang] + "</p>\n\t\t<p>\n\t\t<form onSubmit=\"console.info('onSubmit', arguments, this), arguments[0].preventDefault(), authentify(this.elements[0].value, this.elements[1].value), false\">\n\t\t\t<label for=\"mdpInput\">" + I18N.wall_password_label[lang] + "</label>\n\t\t\t<input id=\"langInput\" class=\"dn\" value=\"" + lang + "\" />\n\t\t\t<input id=\"mdpInput\" class=\"input-reset mw3\" placeholder=\"" + I18N.wall_password_placeholder[lang] + "\" />\n\t\t\t<button type=\"submit\" class=\"button-reset\">" + I18N.wall_password_cta[lang] + "</button>\n\t\t</form>\n\t\t</p>\n\t</div>\n</div>\n\t";
     }
     function TEMPLATE_ANCHOR(data) {
         var page_id = data.page_id, anchor = data.anchor;
@@ -132,35 +121,69 @@ window.minisite = (function (env) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
         return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center mw60em\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns measure\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
-    function TEMPLATE_FULLPAGE_FOOTER(data) {
-        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">SOME COMPANY Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a href=\"/language/\" title=\"Language\" class=\"f6 dib ph2 link mid-gray dim\">Language</a>\n\t\t\t<a href=\"/terms/\"    title=\"Terms\" class=\"f6 dib ph2 link mid-gray dim\">Terms of Use</a>\n\t\t\t<a href=\"/privacy/\"  title=\"Privacy\" class=\"f6 dib ph2 link mid-gray dim\">Privacy</a>\n\t\t</div>\n\t</footer>\n</div>\n";
+    function TEMPLATE_FULLPAGE_FOOTER(lang) {
+        // TODO localize
+        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a href=\"/language/\"        title=\"Language\" class=\"f6 dib ph2 link mid-gray dim\">Language</a>\n\t\t\t<a href=\"/terms/\"            title=\"Legal\" class=\"f6 dib ph2 link mid-gray dim\">Legal stuff</a>\n\t\t\t<a href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" class=\"f6 dib ph2 link mid-gray dim\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
     }
-    ////////////////////////////////////
+    //////////// TODO ////////////
+    var state = {
+        errors: [],
+    };
+    function report_error_msg(msg) { logger.error(msg), state.errors.push(msg); }
+    //////////// LIBS ////////////
     var logger = console;
-    logger.log('constants', CONSTS, PAGE_ITERATOR);
+    logger.log('constants =', CONSTS);
+    var $ = env.$;
+    if (!$)
+        report_error_msg('Expected lib "jQuery" not found !');
     var marked = env.marked;
     if (!marked)
-        state.errors.push('Expected lib "marked" not found !');
-    ////////////////////////////////////
-    function fetch_raw_file(url, required) {
-        if (required === void 0) { required = false; }
-        var p = Promise.resolve($.ajax({
+        report_error_msg('Expected lib "marked" not found !');
+    var jsyaml = env.jsyaml;
+    if (!jsyaml)
+        report_error_msg('Expected lib "jsyaml" not found !');
+    var storage = env.localStorage;
+    if (!jsyaml)
+        report_error_msg('Expected API "localStorage" not found !');
+    //////////// SERVICES ////////////
+    var PAGE_ITERATOR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // transpilation has troubles with more "clever" writings :/
+    // Fetch given file or reject. Resolve with null if 404 and !expected
+    function fetch_raw_file(url, expected) {
+        if (expected === void 0) { expected = true; }
+        return Promise
+            .resolve($.ajax({
             url: url,
             dataType: 'text',
         }))
-            .catch(function (jqXHR, textStatus, errorThrown) { throw errorThrown; }); // fix bad catch call
-        /*
-        // turn pegasus into real promise
-        const p = new Promise((resolve, reject) => pegasus(url).then((x, xhr) => resolve(xhr.responseText), reject))
-        */
-        return p
-            .catch(function (e) {
-            e = e || new Error('unknown error');
-            e.message = "Failed to load " + (required ? 'required' : 'optional') + " file \"" + url + "\" ! (" + e.message + ")";
-            if (required)
-                throw e;
-            else
-                logger.warn(e);
+            .catch(function fix_bad_promise_rejection_from_jquery(jqXHR, textStatus, errorThrown) {
+            var err = errorThrown || new Error(jqXHR.responseText || 'unknown error');
+            err.status = err.status || jqXHR.status || 500;
+            throw err;
+        })
+            .catch(function swallow_error_if_file_is_not_required(e) {
+            //logger.log('swallow_error_if_file_is_not_required', e, expected)
+            e = e || new Error('unknown error while fetching a raw file');
+            e.message = "Failed to fetch " + (expected ? 'required' : 'optional') + " file \"" + url + "\" ! (" + e.status + ", " + e.message + ")";
+            if (e.status === 404 && !expected)
+                return null; /* swallow error */
+            throw e;
+        });
+    }
+    function retry_until_successful_resolution(promise_returning_fn, description) {
+        if (description === void 0) { description = '(unknown op)'; }
+        var MAX_TRY_COUNT = 20;
+        return new Promise(function (resolve) {
+            var try_count = 0;
+            function attempt() {
+                try_count++;
+                var retry_delay_ms = try_count * try_count * 1000;
+                logger.log("\"" + description + "\" attempt #" + try_count + ", timeout = " + retry_delay_ms + "ms");
+                var p = promise_returning_fn();
+                p.then(function (x) { return resolve(x); }, function (e) { if (try_count <= MAX_TRY_COUNT)
+                    setTimeout(attempt, retry_delay_ms); });
+            }
+            // launch 1st attempt asynchronously to not block DOM ready
+            setTimeout(attempt, 0);
         });
     }
     function safely_parse_yaml(raw_data) {
@@ -173,156 +196,36 @@ window.minisite = (function (env) {
             throw err;
         }
     }
-    function attempt_load() {
-        logger.info('Attempting to load latest data...');
-        var raw = {
-            fetch_begin_date: Date.now(),
-            fetch_end_date: undefined,
-            config: undefined,
-            pages: [],
-        };
-        var promises = [];
-        promises.push(fetch_raw_file('content/config.yaml', true)
-            .then(function (data) { return raw.config = data; }));
-        PAGE_ITERATOR.forEach(function (i) {
-            return promises.push(fetch_raw_file("content/page" + (i + 1) + ".markdown")
-                .then(function (data) {
-                if (!data)
-                    return;
-                raw.pages[i] = data;
-            }));
-        });
-        return Promise.all(promises)
-            .then(function () {
-            raw.fetch_end_date = Date.now();
-            logger.log('Load finished, latest load from server:', raw);
-            return raw;
-        })
-            .then(function check() {
-            // check if a page is missing
-            var allPagesOk = raw.pages.reduce(function (acc, page, index) {
-                var isPageOk = Boolean(page);
-                if (!isPageOk)
-                    throw new Error("Page " + (index + 1) + " is missing !");
-                return acc && isPageOk;
-            }, true);
-            if (!allPagesOk)
-                throw new Error('A page is missing !');
-            return raw;
-        })
-            .catch(function (err) {
-            logger.error('Load finished, fetch failed !', err);
-            throw err;
+    // a variant of Promise.race which'll reject only when all have failed
+    function promise_race_successful(p1, p2) {
+        return new Promise(function (resolve, reject) {
+            // resolve with 1st
+            p1.then(resolve);
+            p2.then(resolve);
+            // reject with last
+            p1.catch(function () { return p2.catch(reject); });
+            p2.catch(function () { return p1.catch(reject); });
         });
     }
-    function parse(raw_data) {
-        // decode
-        var content = {
-            config: {},
-            pages: {},
-        };
-        content.config = safely_parse_yaml(raw_data.config);
-        content.pages = raw_data.pages.map(parse_page);
-        return content;
-    }
-    function parse_page(raw_data) {
-        logger.group('parsing page data...');
-        //logger.log('raw data', raw_data)
-        var result = {};
-        var raw_splitted = raw_data.split('---').map(function (s) { return s.trim(); }).filter(function (l) { return l; });
-        //logger.log('raw splitted', raw_splitted)
-        var raw_header = raw_splitted[0], raw_content = raw_splitted.slice(1);
-        if (!raw_content.length)
-            throw new Error('Malformed page: couldn’t separate header/content !');
-        //logger.log('raw header', raw_header)
-        var meta = safely_parse_yaml(raw_header);
-        result.meta = meta;
-        logger.log('parsed header', result.meta);
-        logger.log('raw content', raw_content);
-        raw_content = raw_content.join('---'); // to take into account possible useful --- in markdown
-        result.content = {};
-        var lines = raw_content.split('\n').map(function (s) { return s.trim(); });
-        var current_lang = undefined;
-        var title = undefined;
-        lines.forEach(function (line) {
-            if (line.length === 4 && line[0] === '`' && line[3] === '`') {
-                // this is a lang marker
-                current_lang = line.slice(1, 3);
-                logger.log('found lang', current_lang);
-                result.content[current_lang] = {
-                    title: '',
-                    text: '',
-                };
-                title = undefined;
-                return;
-            }
-            if (!current_lang)
-                throw new Error('Can’t find text language !');
-            if (!line && !result.content[current_lang].text)
-                return; // ignore blank lines while we haven't found the start of content
-            if (!result.content[current_lang].title && line[0] === '#' && line[1] === '#') {
-                // this is the tagline
-                var _a = line.split(' '), marker = _a[0], remain = _a.slice(1);
-                title = remain.join(' ');
-                result.content[current_lang].title = remain.join(' ');
-                return;
-            }
-            result.content[current_lang].text += line + "\n";
+    function make_deferred() {
+        var res_fn = {};
+        var p = new Promise(function (resolve, reject) {
+            res_fn.resolve = resolve;
+            res_fn.reject = reject;
         });
-        logger.log('parsed final result', result);
-        logger.groupEnd();
-        return result;
+        p.resolve = res_fn.resolve;
+        p.reject = res_fn.reject;
+        return p;
     }
-    attempt_load()
-        .then(parse)
-        .then(function (content) {
-        logger.log('content loaded and parsed !', content);
-        on_successful_load(content);
-    })
-        .catch(function (err) {
-        logger.error('Load failed !', err);
-    });
-    state.ready_p.then(function () { return logger.log('content is ready !'); });
-    state.ready_p.then(function (data) { return render(data, state); }).catch(function (e) { return console.error('rendering error', e); });
-    state.ready_p.then(function attempt_auto_auth(content) {
-        var last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password);
-        if (!last_successful_password)
-            return;
-        logger.info('attempting auto-auth...');
-        if (last_successful_password === content.config.password) {
-            state.lang = env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang);
-            console.info(CONSTS.LS_KEYS.last_chosen_lang, env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang));
-            on_successful_auth();
-        }
-    });
-    env.authentify = function (lang, password) {
-        logger.info('[authentify] chosen lang', lang);
-        state.lang = lang;
-        logger.info('[authentify] checking', password);
-        state.ready_p
-            .then(function (content) {
-            logger.info('[authentify] content ready, checking pwd', content.config.password);
-            if (password === content.config.password) {
-                state.lang = lang;
-                on_successful_auth();
-                env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password);
-                env.localStorage.setItem(CONSTS.LS_KEYS.last_chosen_lang, lang);
-            }
-            else {
-            }
-        });
-    };
-    state.authentified_p.then(function () {
-        logger.info('Successful auth !');
-        var el_wall = document.querySelectorAll('#wall')[0];
-        el_wall.style.display = 'none';
-        var el_site = document.querySelectorAll('.main-delayed');
-        polyfill_forEach_if_missing_on(el_site);
-        el_site.forEach(function (el) { if (el.classList)
-            el.classList.remove('dn'); });
-    });
-    function render_wall(content, state) {
-        var languages = content.config.languages;
+    function log_promise(p, target) {
+        p.then(function (d) { return logger.log('* promised "' + target + '" ✓', d); }, function (err) { return logger.error('! promised "' + target + '" ❌', err); });
+    }
+    //////////// RENDERING ////////////
+    function render_wall(config) {
+        logger.groupCollapsed('rendering wall...');
+        logger.log(config);
+        var languages = config.languages;
+        // TODO config and avail lang must intersect
         languages = languages.filter(function (lang) { return CONSTS.AVAILABLE_UI_LANGUAGES.includes(lang); });
         if (languages.length === 0) {
             if (CONSTS.AVAILABLE_UI_LANGUAGES.includes(CONSTS.NAVIGATOR_LANG))
@@ -331,33 +234,43 @@ window.minisite = (function (env) {
                 languages.push(CONSTS.DEFAULT_UI_LANG);
         }
         var new_html = languages
-            .map(function (lang) { return TEMPLATE_WALL(Object.assign({}, content.config, { lang: lang })); })
+            .map(function (lang) { return TEMPLATE_WALL(Object.assign({}, config, { lang: lang })); })
             .join('\n');
         var el_wall_form = document.querySelectorAll('#wall-form')[0];
-        el_wall_form.innerHTML = new_html;
+        if (!el_wall_form)
+            logger.error("couldn't find #wall-form !!");
+        else
+            el_wall_form.innerHTML = new_html;
         var el_wall = document.querySelectorAll('.wall-delayed');
-        polyfill_forEach_if_missing_on(el_wall);
-        el_wall.forEach(function (el) { if (el.classList)
-            el.classList.remove('dn'); });
+        if (!el_wall)
+            logger.error("couldn't find #wall-delayed !!");
+        else {
+            polyfill_forEach_if_missing_on(el_wall);
+            el_wall.forEach(function (el) { if (el.classList)
+                el.classList.remove('dn'); });
+        }
+        logger.groupEnd();
     }
-    function render_menu(content, state) {
-        var new_html = content.pages.map(function (page, i) {
+    function render_menu(pages, lang) {
+        logger.log("rendering menu...", { pages: pages, lang: lang });
+        var new_html = pages.map(function (page, i) {
             return TEMPLATE_ANCHOR({
                 page_id: i + 1,
-                anchor: page.meta.anchor[state.lang],
+                anchor: page.meta.anchor[lang],
             });
         })
             .join('\n');
         var el_menu = document.querySelectorAll('#fp-menu')[0];
         el_menu.innerHTML = new_html;
     }
-    function render_pages(content, state) {
+    function render_pages(config, pages, lang) {
+        logger.log("rendering pages...", { config: config, pages: pages, lang: lang });
         var new_html = [
-            TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, content.config, { lang: state.lang }))
-        ].concat(content.pages.slice(1).map(function (page, i) {
+            TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, config, { lang: lang }))
+        ].concat(pages.slice(1).map(function (page, i) {
             return TEMPLATE_FULLPAGE_SECTION_DEFAULT({
-                title: page.content[state.lang].title,
-                markdown: page.content[state.lang].text,
+                title: page.content[lang].title,
+                markdown: page.content[lang].text,
                 picture: page.meta.picture,
             });
         }), [
@@ -366,17 +279,19 @@ window.minisite = (function (env) {
         var el_fullpage = document.querySelectorAll('#fullpage')[0];
         el_fullpage.innerHTML = new_html;
     }
-    function render_main(content, state) {
-        console.log('render_main', content, state);
-        render_menu(content, state);
-        render_pages(content, state);
+    function render_main(config, pages, lang) {
+        logger.groupCollapsed('rendering main...');
+        logger.log({ config: config, pages: pages, lang: lang });
+        render_menu(pages, lang);
+        render_pages(config, pages, lang);
         // need a small timeout to let the DOM reflow before
         // 1) scrollOverflow does calculations
         // 2) fullpage attempt to scroll to required page (url options)
         setTimeout(function () {
+            logger.log("activating fullpage...");
             $('#fullpage').fullpage({
-                sectionsColor: content.pages.map(function (page, i) { return page.meta.background; }),
-                anchors: content.pages.map(function (page, i) { return "page" + (i + 1); }),
+                sectionsColor: pages.map(function (page, i) { return page.meta.background; }),
+                anchors: pages.map(function (page, i) { return "page" + (i + 1); }),
                 menu: '#fp-menu',
                 paddingTop: '48px',
                 bigSectionsDestination: 'top',
@@ -384,6 +299,7 @@ window.minisite = (function (env) {
                 scrollOverflow: $(window).width() > CONSTS.NOT_SMALL_WIDTH_PX,
                 responsiveWidth: 480,
             });
+            logger.log("activating countdown...");
             // countdown to ; month starts at 0
             var date = new Date(Date.UTC(2017, 6, 1, 16, 0, 0));
             var now = new Date();
@@ -394,17 +310,236 @@ window.minisite = (function (env) {
                 language: 'fr'
             });
         }, 25);
+        logger.groupEnd();
     }
-    function render(data) {
-        logger.log('Rendering...');
-        // choose best language
-        logger.log('choosing lang', data.config.languages, state.lang, CONSTS.NAVIGATOR_LANG, CONSTS.DEFAULT_UI_LANG);
-        var best_auto_lang = data.config.languages.includes(CONSTS.NAVIGATOR_LANG) ? CONSTS.NAVIGATOR_LANG : CONSTS.DEFAULT_UI_LANG;
-        logger.log('best_auto_lang', best_auto_lang);
-        state.lang = state.lang || best_auto_lang || 'en';
-        env.document.title = I18N.wall_header[state.lang](data.config);
-        render_wall(data, state);
-        render_main(data, state);
+    //////////// PROCESSING STEPS ////////////
+    function fetch_raw_config_from_network() {
+        return retry_until_successful_resolution(function () { return fetch_raw_file('content/config.yaml'); }, 'fetch config');
     }
+    function fetch_raw_config_from_local_storage() {
+        return new Promise(function (resolve, reject) {
+            var data = storage.getItem(CONSTS.LS_KEYS.last_successful_raw_config);
+            if (typeof data === 'string')
+                return resolve(data);
+            reject(new Error('raw config not found in storage'));
+        });
+    }
+    function cache_latest_successful_raw_config_to_local_storage(_a) {
+        var raw_config = _a[0], config = _a[1];
+        storage.setItem(CONSTS.LS_KEYS.last_successful_raw_config, raw_config);
+    }
+    function fetch_raw_pages_from_network() {
+        function attempt() {
+            return Promise.all(PAGE_ITERATOR.map(function (i) { return fetch_raw_file("content/page" + (i + 1) + ".markdown", false); }));
+        }
+        return retry_until_successful_resolution(attempt, 'fetch pages');
+    }
+    function fetch_raw_pages_from_local_storage() {
+        return new Promise(function (resolve, reject) {
+            var data = JSON.parse(env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_raw_pages));
+            if (Array.isArray(data))
+                return resolve(data);
+            reject(new Error('raw pages not found in storage !'));
+        });
+    }
+    function cache_latest_successful_raw_pages_to_local_storage(_a) {
+        var raw_pages = _a[0], pages = _a[1];
+        storage.setItem(CONSTS.LS_KEYS.last_successful_raw_pages, JSON.stringify(raw_pages));
+    }
+    function parse_config(raw_config) {
+        return new Promise(function (resolve) { return resolve(safely_parse_yaml(raw_config)); });
+    }
+    function parse_pages(raw_pages) {
+        function check_coherency_and_remove_empty(raw_pages) {
+            // it's ok to have less than the max count of pages
+            // but check if there is a hole
+            var cleaned_pages = [];
+            raw_pages.forEach(function (page, index) {
+                var isPageOk = Boolean(page);
+                if (!isPageOk)
+                    return;
+                if (cleaned_pages.length < index)
+                    throw new Error("page # " + (cleaned_pages.length + 1) + " is missing !");
+                cleaned_pages.push(page);
+            });
+            return cleaned_pages;
+        }
+        function parse_page(raw_page, debug_id) {
+            if (debug_id === void 0) { debug_id = '?'; }
+            logger.groupCollapsed("parsing page \"" + debug_id + "\"...");
+            //logger.log('raw data', raw_data)
+            var result = {};
+            var raw_split = raw_page.split('---').map(function (s) { return s.trim(); }).filter(function (l) { return l; });
+            //logger.log('raw split', raw_split)
+            var raw_header = raw_split[0], raw_content = raw_split.slice(1);
+            if (!raw_content.length)
+                throw new Error('Malformed page: couldn’t separate header/content !');
+            //logger.log('raw header', raw_header)
+            var meta = safely_parse_yaml(raw_header);
+            result.meta = meta;
+            //logger.log('parsed header', result.meta)
+            //logger.log('raw content', raw_content)
+            raw_content = raw_content.join('---'); // to take into account possible useful --- in markdown
+            result.content = {};
+            var lines = raw_content.split('\n').map(function (s) { return s.trim(); });
+            var current_lang = undefined;
+            var title = undefined;
+            lines.forEach(function (line) {
+                if (line.length === 4 && line[0] === '`' && line[3] === '`') {
+                    // this is a lang marker
+                    current_lang = line.slice(1, 3);
+                    logger.log('found lang', current_lang);
+                    // TODO check if lang is supported !
+                    result.content[current_lang] = {
+                        title: '',
+                        text: '',
+                    };
+                    title = undefined;
+                    return;
+                }
+                if (!current_lang)
+                    throw new Error('Can’t find text language !');
+                if (!line && !result.content[current_lang].text)
+                    return; // ignore blank lines while we haven't found the start of content
+                if (!result.content[current_lang].title && line[0] === '#' && line[1] === '#') {
+                    // this is the tagline
+                    var _a = line.split(' '), marker = _a[0], remain = _a.slice(1);
+                    title = remain.join(' ');
+                    result.content[current_lang].title = remain.join(' ');
+                    return;
+                }
+                result.content[current_lang].text += line + "\n";
+            });
+            logger.log('parsed final result', result);
+            logger.groupEnd();
+            // TODO check lang coherency ! (all lang have their versions)
+            return result;
+        }
+        return Promise.resolve(raw_pages)
+            .then(check_coherency_and_remove_empty)
+            .then(function (raw_pages) { return raw_pages.map(parse_page); });
+    }
+    //////////// SEQUENCING ////////////
+    var cascade = {};
+    var cascade_begin_date = Date.now();
+    function log_cascade(id) {
+        var TIMEOUT_MS = 20 * 1000;
+        var resolved = false;
+        var p = cascade[id];
+        p.then(function (d) {
+            logger.groupCollapsed("\u2713 promised \"" + id + "\" (" + (Date.now() - cascade_begin_date) + "ms)");
+            logger.info(d);
+            logger.groupEnd();
+            resolved = true;
+        }, function (err) {
+            logger.groupCollapsed("\u274C\u274C\u274C promised \"" + id + "\" (" + (Date.now() - cascade_begin_date) + "ms)");
+            logger.error(err);
+            logger.groupEnd();
+            resolved = true;
+        });
+        setTimeout(function () {
+            //logger.log('checking state of cascade ' + id)
+            if (resolved)
+                return;
+            logger.groupCollapsed("??? promised \"" + id + "\" not yet resolved after " + (Date.now() - cascade_begin_date) + "ms...");
+            logger.error('Timed out...', TIMEOUT_MS);
+            logger.groupEnd();
+        }, TIMEOUT_MS);
+    }
+    ////////////////////////////////////
+    cascade.raw_config_from_network = fetch_raw_config_from_network();
+    log_cascade('raw_config_from_network');
+    ////////////////////////////////////
+    cascade.raw_config_fast = promise_race_successful(cascade.raw_config_from_network, fetch_raw_config_from_local_storage());
+    log_cascade('raw_config_fast');
+    ////////////////////////////////////
+    cascade.config_fast = cascade.raw_config_fast.then(parse_config);
+    log_cascade('config_fast');
+    ////////////////////////////////////
+    cascade.config_latest = cascade.raw_config_from_network.then(parse_config);
+    log_cascade('config_latest');
+    ////////////////////////////////////
+    cascade.raw_pages_from_network = fetch_raw_pages_from_network();
+    log_cascade('raw_pages_from_network');
+    ////////////////////////////////////
+    cascade.raw_pages_fast = promise_race_successful(cascade.raw_pages_from_network, fetch_raw_pages_from_local_storage());
+    log_cascade('raw_pages_fast');
+    ////////////////////////////////////
+    cascade.pages_fast = cascade.raw_pages_fast.then(parse_pages);
+    log_cascade('pages_fast');
+    ////////////////////////////////////
+    cascade.pages_latest = cascade.raw_pages_from_network.then(parse_pages);
+    log_cascade('pages_latest');
+    ////////////////////////////////////
+    cascade.dom_ready = new Promise(function (resolve) { return $(env.document).ready(function () { return resolve(); }); });
+    log_cascade('dom_ready');
+    ////////////////////////////////////
+    Promise.all([
+        cascade.raw_config_from_network,
+        cascade.config_latest,
+    ]).then(cache_latest_successful_raw_config_to_local_storage);
+    Promise.all([
+        cascade.raw_pages_from_network,
+        cascade.pages_latest,
+    ]).then(cache_latest_successful_raw_pages_to_local_storage);
+    cascade.dom_ready
+        .then(function () { return cascade.config_fast; })
+        .then(render_wall)
+        .catch(function (e) { return logger.error('fast wall rendering error', e); })
+        .then(function () { return cascade.config_latest; })
+        .then(render_wall)
+        .catch(function (e) { return logger.error('latest wall rendering error', e); });
+    ////////////////////////////////////
+    var auth_success = false; // mini state ;)
+    env.authentify = function (user_selected_lang, password, from_saved_data) {
+        if (from_saved_data === void 0) { from_saved_data = false; }
+        //logger.info('[authentify]', {user_selected_lang, password, from_saved_data, auth_success})
+        if (auth_success)
+            return;
+        var best_config = promise_race_successful(cascade.config_latest, cascade.config_fast);
+        best_config.then(function (config) {
+            logger.info("[authentify] config ready, advancing...");
+            //logger.info(`[authentify] checking pwd against "${config.password}"…`)
+            if (password === config.password) {
+                logger.info("[authentify] success !");
+                auth_success = true;
+                if (!from_saved_data) {
+                    env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password);
+                    env.localStorage.setItem(CONSTS.LS_KEYS.last_chosen_lang, user_selected_lang);
+                }
+                // choose best language
+                logger.log('choosing lang', config.languages, user_selected_lang, CONSTS.NAVIGATOR_LANG, CONSTS.DEFAULT_UI_LANG);
+                var best_auto_lang = config.languages.includes(CONSTS.NAVIGATOR_LANG) ? CONSTS.NAVIGATOR_LANG : CONSTS.DEFAULT_UI_LANG;
+                logger.log('best_auto_lang', best_auto_lang);
+                var lang_1 = user_selected_lang || best_auto_lang || CONSTS.DEFAULT_UI_LANG;
+                env.document.title = I18N.wall_header[lang_1](config);
+                var best_pages = promise_race_successful(cascade.pages_latest, cascade.pages_fast);
+                best_pages
+                    .then(function (pages) { return render_main(config, pages, lang_1); })
+                    .then(function swap_wall_and_content() {
+                    var el_wall = document.querySelectorAll('#wall')[0];
+                    el_wall.style.display = 'none';
+                    var el_site = document.querySelectorAll('.main-delayed');
+                    polyfill_forEach_if_missing_on(el_site);
+                    el_site.forEach(function (el) { if (el.classList)
+                        el.classList.remove('dn'); });
+                })
+                    .catch(function (e) { return logger.error('rendering error', e); });
+            }
+            else {
+            }
+        });
+        return false;
+    };
+    cascade.dom_ready.then(function () {
+        var last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password);
+        if (!last_successful_password)
+            return;
+        var last_chosen_lang = env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang);
+        if (!last_chosen_lang)
+            return;
+        logger.info('attempting auto-auth...');
+        env.authentify(last_chosen_lang, last_successful_password, true);
+    });
 })(window);
 //# sourceMappingURL=minisite.js.map

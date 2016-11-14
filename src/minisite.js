@@ -84,8 +84,9 @@ window.minisite = (function(env) {
 		MAX_PAGES: 12,
 		AVAILABLE_UI_LANGUAGES: [ 'en', 'fr' ],
 		DEFAULT_UI_LANG: 'en',
-		NAVIGATOR_LANG: (window.navigator.userLanguage || window.navigator.language || 'en').split('-')[0],
+		NAVIGATOR_LANG: (env.navigator.userLanguage || env.navigator.language || 'en').split('-')[0],
 		NOT_SMALL_WIDTH_PX: 480, // tachyons "not small" breakpoint, experimentally measured
+		REPO_URL: 'https://github.com/Offirmo/minisite-w',
 	}
 
 	const I18N = {
@@ -126,7 +127,7 @@ window.minisite = (function(env) {
 		<h2 class="mv2"><img src="${I18N.svg_flag[lang]}" class="v-base mr2" width="26">${I18N.wall_header[lang]({ bride, groom })}</h2>
 		<p class="f6">${I18N.wall_text[lang]}</p>
 		<p>
-		<form onSubmit="authentify(this.elements[0].value, this.elements[1].value), false">
+		<form onSubmit="console.info('onSubmit', arguments, this), arguments[0].preventDefault(), authentify(this.elements[0].value, this.elements[1].value), false">
 			<label for="mdpInput">${I18N.wall_password_label[lang]}</label>
 			<input id="langInput" class="dn" value="${lang}" />
 			<input id="mdpInput" class="input-reset mw3" placeholder="${I18N.wall_password_placeholder[lang]}" />
@@ -183,15 +184,16 @@ window.minisite = (function(env) {
 `
 	}
 
-	function TEMPLATE_FULLPAGE_FOOTER(data) {
+	function TEMPLATE_FULLPAGE_FOOTER(lang) {
+		// TODO localize
 		return `
 <div class="section fp-auto-height">
 	<footer class="pb4">
-		<small class="f6 db tc">© 2016 <b class="ttu">SOME COMPANY Inc</b>., All Rights Reserved</small>
+		<small class="f6 db tc">© 2016 <b class="ttu">Offirmo Inc</b>., All Rights Reserved</small>
 		<div class="tc mt3">
-			<a href="/language/" title="Language" class="f6 dib ph2 link mid-gray dim">Language</a>
-			<a href="/terms/"    title="Terms" class="f6 dib ph2 link mid-gray dim">Terms of Use</a>
-			<a href="/privacy/"  title="Privacy" class="f6 dib ph2 link mid-gray dim">Privacy</a>
+			<a href="/language/"        title="Language" class="f6 dib ph2 link mid-gray dim">Language</a>
+			<a href="/terms/"            title="Legal" class="f6 dib ph2 link mid-gray dim">Legal stuff</a>
+			<a href="${CONSTS.REPO_URL}" title="fork" class="f6 dib ph2 link mid-gray dim">Fork on Github</a>
 		</div>
 	</footer>
 </div>
@@ -209,6 +211,9 @@ window.minisite = (function(env) {
 
 	const logger = console
 	logger.log('constants =', CONSTS)
+
+	const $ = env.$
+	if (! $) report_error_msg('Expected lib "jQuery" not found !')
 
 	const marked = env.marked
 	if (! marked) report_error_msg('Expected lib "marked" not found !')
@@ -236,7 +241,7 @@ window.minisite = (function(env) {
 				throw err
 			})
 			.catch(function swallow_error_if_file_is_not_required(e) {
-				//console.log('swallow_error_if_file_is_not_required', e, expected)
+				//logger.log('swallow_error_if_file_is_not_required', e, expected)
 				e = e || new Error('unknown error while fetching a raw file')
 				e.message = `Failed to fetch ${expected ? 'required' : 'optional'} file "${url}" ! (${e.status}, ${e.message})`
 
@@ -256,7 +261,7 @@ window.minisite = (function(env) {
 			function attempt() {
 				try_count++
 				const retry_delay_ms = try_count * try_count * 1000
-				console.log(`attempting ${description} #${try_count}`, retry_delay_ms)
+				logger.log(`"${description}" attempt #${try_count}, timeout = ${retry_delay_ms}ms`)
 				const p = promise_returning_fn()
 				p.then(
 					x => resolve(x),
@@ -264,7 +269,8 @@ window.minisite = (function(env) {
 				)
 			}
 
-			attempt()
+			// launch 1st attempt asynchronously to not block DOM ready
+			setTimeout(attempt, 0)
 		})
 	}
 
@@ -314,8 +320,12 @@ window.minisite = (function(env) {
 
 	//////////// RENDERING ////////////
 
-	function render_wall(content, state) {
-		let languages = content.config.languages
+	function render_wall(config) {
+		logger.groupCollapsed('rendering wall...')
+		logger.log(config)
+
+		let languages = config.languages
+		// TODO config and avail lang must intersect
 		languages = languages.filter(lang => CONSTS.AVAILABLE_UI_LANGUAGES.includes(lang))
 		if (languages.length === 0) {
 			if (CONSTS.AVAILABLE_UI_LANGUAGES.includes(CONSTS.NAVIGATOR_LANG))
@@ -325,20 +335,33 @@ window.minisite = (function(env) {
 		}
 
 		const new_html = languages
-			.map(lang => TEMPLATE_WALL(Object.assign({}, content.config, {lang})))
+			.map(lang => TEMPLATE_WALL(Object.assign({}, config, {lang})))
 			.join('\n')
+
 		const el_wall_form = document.querySelectorAll('#wall-form')[0]
-		el_wall_form.innerHTML = new_html
+		if (!el_wall_form)
+			logger.error(`couldn't find #wall-form !!`)
+		else
+			el_wall_form.innerHTML = new_html
+
 		const el_wall = document.querySelectorAll('.wall-delayed')
-		polyfill_forEach_if_missing_on(el_wall)
-		el_wall.forEach(el => { if (el.classList) el.classList.remove('dn') })
+		if (!el_wall)
+			logger.error(`couldn't find #wall-delayed !!`)
+		else {
+			polyfill_forEach_if_missing_on(el_wall)
+			el_wall.forEach(el => { if (el.classList) el.classList.remove('dn') })
+		}
+
+		logger.groupEnd()
 	}
 
-	function render_menu(content, state) {
-		const new_html =  content.pages.map((page, i) => {
+	function render_menu(pages, lang) {
+		logger.log(`rendering menu...`, {pages, lang})
+
+		const new_html =  pages.map((page, i) => {
 				return TEMPLATE_ANCHOR({
 					page_id: i + 1,
-					anchor: page.meta.anchor[state.lang],
+					anchor: page.meta.anchor[lang],
 				})
 			})
 			.join('\n')
@@ -347,13 +370,15 @@ window.minisite = (function(env) {
 		el_menu.innerHTML = new_html
 	}
 
-	function render_pages(content, state) {
+	function render_pages(config, pages, lang) {
+		logger.log(`rendering pages...`, {config, pages, lang})
+
 		const new_html =  [
-				TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, content.config, {lang: state.lang})),
-				...content.pages.slice(1).map((page, i) => {
+				TEMPLATE_FULLPAGE_SECTION_HOME(Object.assign({}, config, {lang})),
+				...pages.slice(1).map((page, i) => {
 					return TEMPLATE_FULLPAGE_SECTION_DEFAULT({
-						title: page.content[state.lang].title,
-						markdown: page.content[state.lang].text,
+						title: page.content[lang].title,
+						markdown: page.content[lang].text,
 						picture: page.meta.picture,
 					})
 				}),
@@ -365,19 +390,21 @@ window.minisite = (function(env) {
 		el_fullpage.innerHTML = new_html
 	}
 
-	function render_main(content, state) {
-		console.log('render_main', content, state)
+	function render_main(config, pages, lang) {
+		logger.groupCollapsed('rendering main...')
+		logger.log({config, pages, lang})
 
-		render_menu(content, state)
-		render_pages(content, state)
+		render_menu(pages, lang)
+		render_pages(config, pages, lang)
 
 		// need a small timeout to let the DOM reflow before
 		// 1) scrollOverflow does calculations
 		// 2) fullpage attempt to scroll to required page (url options)
 		setTimeout(() => {
+			logger.log(`activating fullpage...`)
 			$('#fullpage').fullpage({
-				sectionsColor: content.pages.map((page, i) => page.meta.background),
-				anchors: content.pages.map((page, i) => `page${i+1}`),
+				sectionsColor: pages.map((page, i) => page.meta.background),
+				anchors: pages.map((page, i) => `page${i+1}`),
 				menu: '#fp-menu',
 				paddingTop: '48px',
 				bigSectionsDestination: 'top',
@@ -386,6 +413,7 @@ window.minisite = (function(env) {
 				responsiveWidth: 480,
 			})
 
+			logger.log(`activating countdown...`)
 			// countdown to ; month starts at 0
 			var date  = new Date(Date.UTC(2017, 6, 1, 16, 0, 0));
 			var now   = new Date();
@@ -396,22 +424,8 @@ window.minisite = (function(env) {
 				language: 'fr'
 			})
 		}, 25)
-	}
 
-	function render(data) {
-		logger.log('Rendering...')
-
-		// choose best language
-		logger.log('choosing lang', data.config.languages, state.lang, CONSTS.NAVIGATOR_LANG, CONSTS.DEFAULT_UI_LANG)
-
-		const best_auto_lang = data.config.languages.includes(CONSTS.NAVIGATOR_LANG) ? CONSTS.NAVIGATOR_LANG : CONSTS.DEFAULT_UI_LANG
-		logger.log('best_auto_lang', best_auto_lang)
-		state.lang = state.lang || best_auto_lang || 'en'
-
-		env.document.title = I18N.wall_header[state.lang](data.config)
-
-		render_wall(data, state)
-		render_main(data, state)
+		logger.groupEnd()
 	}
 
 	//////////// PROCESSING STEPS ////////////
@@ -461,7 +475,6 @@ window.minisite = (function(env) {
 	}
 
 	function cache_latest_successful_raw_pages_to_local_storage([raw_pages, pages]) {
-		debugger
 		storage.setItem(CONSTS.LS_KEYS.last_successful_raw_pages, JSON.stringify(raw_pages))
 	}
 
@@ -471,16 +484,22 @@ window.minisite = (function(env) {
 
 	function parse_pages(raw_pages) {
 
-		function check_coherency(raw_pages) {
-			// check if a page is missing
-			// TODO recode
-			/*const allPagesOk = raw_pages.reduce((acc, page, index) => {
+		function check_coherency_and_remove_empty(raw_pages) {
+			// it's ok to have less than the max count of pages
+			// but check if there is a hole
+			const cleaned_pages = []
+
+			raw_pages.forEach((page, index) => {
 				const isPageOk = Boolean(page)
-				if (!isPageOk) throw new Error(`Page ${index + 1} is missing !`)
-				return acc && isPageOk
-			}, true)
-			if (!allPagesOk) throw new Error('A page is missing !')*/
-			return raw_pages
+				if (!isPageOk) return;
+
+				if (cleaned_pages.length < index)
+					throw new Error(`page # ${cleaned_pages.length + 1} is missing !`)
+
+				cleaned_pages.push(page)
+			})
+
+			return cleaned_pages
 		}
 
 		function parse_page(raw_page, debug_id = '?') {
@@ -516,6 +535,7 @@ window.minisite = (function(env) {
 					// this is a lang marker
 					current_lang = line.slice(1,3)
 					logger.log('found lang', current_lang)
+					// TODO check if lang is supported !
 					result.content[current_lang] = {
 						title: '',
 						text: '',
@@ -541,11 +561,13 @@ window.minisite = (function(env) {
 
 			logger.groupEnd()
 
+			// TODO check lang coherency ! (all lang have their versions)
+
 			return result
 		}
 
 		return Promise.resolve(raw_pages)
-			.then(check_coherency)
+			.then(check_coherency_and_remove_empty)
 			.then(raw_pages => raw_pages.map(parse_page))
 	}
 
@@ -555,19 +577,19 @@ window.minisite = (function(env) {
 	const cascade_begin_date = Date.now()
 
 	function log_cascade(id) {
-		const TIMEOUT_MS = 10 * 1000
+		const TIMEOUT_MS = 20 * 1000
 		let resolved = false
 
 		const p = cascade[id]
 		p.then(
 			(d) => {
-				logger.groupCollapsed(`✓ promised "${id}" (${Date.now() - cascade_begin_date})`)
+				logger.groupCollapsed(`✓ promised "${id}" (${Date.now() - cascade_begin_date}ms)`)
 				logger.info(d)
 				logger.groupEnd()
 				resolved = true
 			},
 			(err) => {
-				logger.groupCollapsed(`❌❌❌ promised "${id}" (${Date.now() - cascade_begin_date})`)
+				logger.groupCollapsed(`❌❌❌ promised "${id}" (${Date.now() - cascade_begin_date}ms)`)
 				logger.error(err)
 				logger.groupEnd()
 				resolved = true
@@ -575,10 +597,11 @@ window.minisite = (function(env) {
 		)
 
 		setTimeout(() => {
+			//logger.log('checking state of cascade ' + id)
 			if (resolved) return
 
-			logger.groupCollapsed(`❌❌❌ promised "${id}" (${Date.now() - cascade_begin_date})`)
-			logger.error('Timed out...')
+			logger.groupCollapsed(`??? promised "${id}" not yet resolved after ${Date.now() - cascade_begin_date}ms...`)
+			logger.error('Timed out...', TIMEOUT_MS)
 			logger.groupEnd()
 		}, TIMEOUT_MS)
 	}
@@ -622,12 +645,8 @@ window.minisite = (function(env) {
 	log_cascade('pages_latest')
 
 	////////////////////////////////////
-	cascade.authentication_success = make_deferred()
-	log_cascade('authentication_success')
-
-	////////////////////////////////////
-	cascade.user_selected_language = make_deferred()
-	log_cascade('user_selected_language')
+	cascade.dom_ready = new Promise(resolve => $(env.document).ready(() => resolve()))
+	log_cascade('dom_ready')
 
 	////////////////////////////////////
 
@@ -641,56 +660,81 @@ window.minisite = (function(env) {
 		cascade.pages_latest,
 	]).then(cache_latest_successful_raw_pages_to_local_storage)
 
-	Promise.all([
-		cascade.config_fast,
-		cascade.pages_fast,
-		cascade.user_selected_language,
-		cascade.authentication_success,
-	]).then(function TODO() {})
+	cascade.dom_ready
+		.then(() => cascade.config_fast)
+		.then(render_wall)
+		.catch(e => logger.error('fast wall rendering error', e))
+		.then(() => cascade.config_latest)
+		.then(render_wall)
+		.catch(e => logger.error('latest wall rendering error', e))
 
-	return
+	////////////////////////////////////
 
-	//////////// TOSORT XXX ////////////
+	let auth_success = false // mini state ;)
+	env.authentify = (user_selected_lang, password, from_saved_data = false) => {
+		//logger.info('[authentify]', {user_selected_lang, password, from_saved_data, auth_success})
+		if (auth_success) return
 
-	state.ready_p.then(data => render(data, state)).catch(e => console.error('rendering error', e))
-	state.ready_p.then(function attempt_auto_auth(content) {
+		const best_config = promise_race_successful(
+			cascade.config_latest,
+			cascade.config_fast
+		)
+
+		best_config.then(config => {
+			logger.info(`[authentify] config ready, advancing...`)
+
+			//logger.info(`[authentify] checking pwd against "${config.password}"…`)
+			if (password === config.password) {
+				logger.info(`[authentify] success !`)
+				auth_success = true
+
+				if (! from_saved_data) {
+					env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password)
+					env.localStorage.setItem(CONSTS.LS_KEYS.last_chosen_lang, user_selected_lang)
+				}
+
+				// choose best language
+				logger.log('choosing lang', config.languages, user_selected_lang, CONSTS.NAVIGATOR_LANG, CONSTS.DEFAULT_UI_LANG)
+				const best_auto_lang = config.languages.includes(CONSTS.NAVIGATOR_LANG) ? CONSTS.NAVIGATOR_LANG : CONSTS.DEFAULT_UI_LANG
+				logger.log('best_auto_lang', best_auto_lang)
+				const lang = user_selected_lang || best_auto_lang || CONSTS.DEFAULT_UI_LANG
+
+				env.document.title = I18N.wall_header[lang](config)
+
+				const best_pages = promise_race_successful(
+					cascade.pages_latest,
+					cascade.pages_fast
+				)
+
+				best_pages
+					.then(pages => render_main(config, pages, lang))
+					.then(function swap_wall_and_content() {
+						const el_wall = document.querySelectorAll('#wall')[0]
+						el_wall.style.display = 'none'
+
+						const el_site = document.querySelectorAll('.main-delayed')
+						polyfill_forEach_if_missing_on(el_site)
+						el_site.forEach(el => { if (el.classList) el.classList.remove('dn') })
+					})
+					.catch(e => logger.error('rendering error', e))
+			}
+			else {
+				// TODO show instructions for acquiring password !
+			}
+		})
+
+		return false
+	}
+
+	cascade.dom_ready.then(() => {
 		const last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password)
 		if (!last_successful_password) return
 
+		const last_chosen_lang = env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang)
+		if (!last_chosen_lang) return
+
 		logger.info('attempting auto-auth...')
-		if (last_successful_password === content.config.password) {
-			state.lang = env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang)
-			console.info(CONSTS.LS_KEYS.last_chosen_lang, env.localStorage.getItem(CONSTS.LS_KEYS.last_chosen_lang))
-			on_successful_auth()
-		}
-	})
-
-	env.authentify = (lang, password) => {
-		logger.info('[authentify] chosen lang', lang)
-		state.lang = lang
-		logger.info('[authentify] checking', password)
-		state.ready_p
-			.then(content => {
-				logger.info('[authentify] content ready, checking pwd', content.config.password)
-				if (password === content.config.password) {
-					state.lang = lang
-					on_successful_auth()
-					env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password)
-					env.localStorage.setItem(CONSTS.LS_KEYS.last_chosen_lang, lang)
-				}
-				else {
-					// TODO instructions !
-				}
-			})
-	}
-
-	state.authentified_p.then(() => {
-		logger.info('Successful auth !')
-		const el_wall = document.querySelectorAll('#wall')[0]
-		el_wall.style.display = 'none'
-		const el_site = document.querySelectorAll('.main-delayed')
-		polyfill_forEach_if_missing_on(el_site)
-		el_site.forEach(el => { if (el.classList) el.classList.remove('dn') })
+		env.authentify(last_chosen_lang, last_successful_password, true)
 	})
 
 })(window)
