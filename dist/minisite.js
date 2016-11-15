@@ -123,7 +123,7 @@ window.minisite = (function (env) {
     }
     function TEMPLATE_FULLPAGE_SECTION_MAP(data) {
         var title = data.title, container_id = data.container_id, picture = data.picture, markdown = data.markdown;
-        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<div id=\"" + container_id + "\" style=\"height: 360px; width: 100%;\"></div>\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
+        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<div id=\"" + container_id + "\" class=\"aspect-ratio aspect-ratio--6x4\"></div>\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_SECTION_CONTACT(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
@@ -131,7 +131,7 @@ window.minisite = (function (env) {
     }
     function TEMPLATE_FULLPAGE_FOOTER(lang) {
         // TODO localize
-        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/language/\" title=\"Language\">Language</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/terms/\" title=\"Legal\">Legal stuff</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" target=\"_blank\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
+        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/language/\" title=\"Language\">Language</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/terms/\" title=\"Legal\">Legal stuff</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" target=\"_blank\" rel=\"noopener noreferrer\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
     }
     //////////// TODO ////////////
     // mini state ;) It's ugly, I know...

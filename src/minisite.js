@@ -194,7 +194,7 @@ window.minisite = (function(env) {
 			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
 				${title}
 			</h1>
-			<div id="${container_id}" style="height: 360px; width: 100%;"></div>
+			<div id="${container_id}" class="aspect-ratio aspect-ratio--6x4"></div>
 		</header>
 		<div class="fn fl-ns w-50-ns measure">
 			${marked(markdown)}
@@ -233,7 +233,7 @@ window.minisite = (function(env) {
 		<div class="tc mt3">
 			<a class="f6 dib ph2 link mid-gray dim" href="/language/" title="Language">Language</a>
 			<a class="f6 dib ph2 link mid-gray dim" href="/terms/" title="Legal">Legal stuff</a>
-			<a class="f6 dib ph2 link mid-gray dim" href="${CONSTS.REPO_URL}" title="fork" target="_blank">Fork on Github</a>
+			<a class="f6 dib ph2 link mid-gray dim" href="${CONSTS.REPO_URL}" title="fork" target="_blank" rel="noopener noreferrer">Fork on Github</a>
 		</div>
 	</footer>
 </div>
