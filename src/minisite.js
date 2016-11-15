@@ -169,8 +169,8 @@ window.minisite = (function(env) {
 
 		return `
 <div class="section">
-	<article class="cf ph3 ph5-ns pv3 center mw60em">
-		<header class="fn fl-ns w-50-ns pr4-ns measure">
+	<article class="cf ph3 ph5-ns pv3 center">
+		<header class="fn fl-ns w-50-ns pr4-ns">
 			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
 				${title}
 			</h1>
@@ -189,8 +189,8 @@ window.minisite = (function(env) {
 
 		return `
 <div class="section">
-	<article class="cf ph3 ph5-ns pv3 center mw60em">
-		<header class="fn fl-ns w-50-ns pr4-ns measure">
+	<article class="cf ph3 ph5-ns pv3 center">
+		<header class="fn fl-ns w-50-ns pr4-ns">
 			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
 				${title}
 			</h1>
@@ -202,12 +202,26 @@ window.minisite = (function(env) {
 	</article>
 </div>
 `
+	}
+	function TEMPLATE_FULLPAGE_SECTION_CONTACT(data) {
+		const { title, picture, markdown } = data
 
-		/*
-		 <div style="height: 360px; width: 100%; overflow: hidden;">
-		 <div id="${container_id}" style="height: 360px; width: 600px;"></div>
-		 </div>
-		 */
+		return `
+<div class="section">
+	<article class="cf ph3 ph5-ns pv3 center">
+		<header class="fn fl-ns w-50-ns pr4-ns">
+			<h1 class="f2 lh-title fw9 mb3 mt0 pt3">
+				${title}
+			</h1>
+			<img src="content/${picture}" class="">
+		</header>
+		<div class="fn fl-ns w-50-ns measure">
+			${marked(markdown)}
+			TODO contact form !
+		</div>
+	</article>
+</div>
+`
 	}
 
 	function TEMPLATE_FULLPAGE_FOOTER(lang) {
@@ -228,8 +242,10 @@ window.minisite = (function(env) {
 
 	//////////// TODO ////////////
 
+	// mini state ;) It's ugly, I know...
 	const state = {
 		errors: [],
+		authentified: false,
 	}
 	function report_error_msg(msg) { logger.error(msg), state.errors.push(msg)}
 
@@ -409,6 +425,7 @@ window.minisite = (function(env) {
 		const templates_by_layout = {
 			home: TEMPLATE_FULLPAGE_SECTION_HOME,
 			map: TEMPLATE_FULLPAGE_SECTION_MAP,
+			contact: TEMPLATE_FULLPAGE_SECTION_CONTACT,
 			default: TEMPLATE_FULLPAGE_SECTION_DEFAULT,
 		}
 		const new_html = [
@@ -441,42 +458,46 @@ window.minisite = (function(env) {
 			const container_id = get_unique_section_container_id(index)
 			logger.log(`map container id =`, container_id)
 
-			const leaflet_map = leaflet.map(container_id)
-			leaflet_map.setView([51.505, -0.09], 13);
+			// leaflet doesn't like when it's container changes its size
+			// So we delay the setup a bit to wait for redraw.
+			setTimeout(function setup_map_on_stable_dom() {
+				const leaflet_map = leaflet.map(container_id)
+				leaflet_map.setView([51.505, -0.09], 13);
 
-			leaflet.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
-				maxZoom: 18,
-				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-				id: 'mapbox.streets'
-			}).addTo(leaflet_map);
+				leaflet.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+					maxZoom: 18,
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+					'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+					id: 'mapbox.streets'
+				}).addTo(leaflet_map);
 
-			const marker = leaflet.marker([51.5, -0.09]).addTo(leaflet_map);
+				const marker = leaflet.marker([51.5, -0.09])
+				marker.addTo(leaflet_map);
+				marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
 
-			/*
-			var circle = L.circle([51.508, -0.11], {
-				color: 'red',
-				fillColor: '#f03',
-				fillOpacity: 0.5,
-				radius: 500
-			}).addTo(mymap);
+				/*
+				 var circle = L.circle([51.508, -0.11], {
+				 color: 'red',
+				 fillColor: '#f03',
+				 fillOpacity: 0.5,
+				 radius: 500
+				 }).addTo(mymap);
+				 circle.bindPopup("I am a circle.");
 
-			var polygon = L.polygon([
-				[51.509, -0.08],
-				[51.503, -0.06],
-				[51.51, -0.047]
-			]).addTo(mymap);
+				 var polygon = L.polygon([
+				 [51.509, -0.08],
+				 [51.503, -0.06],
+				 [51.51, -0.047]
+				 ]).addTo(mymap);
+				 polygon.bindPopup("I am a polygon.");
 
-			marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
-			circle.bindPopup("I am a circle.");
-			polygon.bindPopup("I am a polygon.");
-
-			var popup = L.popup()
-				.setLatLng([51.5, -0.09])
-				.setContent("I am a standalone popup.")
-				.openOn(mymap);
-				*/
+				 var popup = L.popup()
+				 .setLatLng([51.5, -0.09])
+				 .setContent("I am a standalone popup.")
+				 .openOn(mymap);
+				 */
+			}, 5)
 		})
 	}
 
@@ -762,10 +783,9 @@ window.minisite = (function(env) {
 
 	////////////////////////////////////
 
-	let auth_success = false // mini state ;)
 	env.authentify = (user_selected_lang, password, from_saved_data = false) => {
-		//logger.info('[authentify]', {user_selected_lang, password, from_saved_data, auth_success})
-		if (auth_success) return
+		//logger.info('[authentify]', {user_selected_lang, password, from_saved_data, state.authentified})
+		if (state.authentified) return
 
 		const best_config = promise_race_successful(
 			cascade.config_latest,
@@ -778,7 +798,7 @@ window.minisite = (function(env) {
 			//logger.info(`[authentify] checking pwd against "${config.password}"…`)
 			if (password === config.password) {
 				logger.info(`[authentify] success !`)
-				auth_success = true
+				state.authentified = true
 
 				if (! from_saved_data) {
 					env.localStorage.setItem(CONSTS.LS_KEYS.last_successful_password, password)
