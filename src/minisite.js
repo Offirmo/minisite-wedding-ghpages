@@ -460,6 +460,7 @@ window.minisite = (function(env) {
 
 			// leaflet doesn't like when it's container changes its size
 			// So we delay the setup a bit to wait for redraw.
+			// http://stackoverflow.com/questions/17863904/leaflet-mapbox-rendering-issue-grey-area
 			setTimeout(function setup_map_on_stable_dom() {
 				const leaflet_map = leaflet.map(container_id)
 				leaflet_map.setView([51.505, -0.09], 13);
@@ -475,6 +476,9 @@ window.minisite = (function(env) {
 				const marker = leaflet.marker([51.5, -0.09])
 				marker.addTo(leaflet_map);
 				marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+
+				// TODO
+				// http://stackoverflow.com/questions/16845614/zoom-to-fit-all-markers-in-mapbox-or-leaflet
 
 				/*
 				 var circle = L.circle([51.508, -0.11], {
