@@ -131,7 +131,7 @@ window.minisite = (function (env) {
     }
     function TEMPLATE_FULLPAGE_FOOTER(lang) {
         // TODO localize
-        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a href=\"/language/\"        title=\"Language\" class=\"f6 dib ph2 link mid-gray dim\">Language</a>\n\t\t\t<a href=\"/terms/\"            title=\"Legal\" class=\"f6 dib ph2 link mid-gray dim\">Legal stuff</a>\n\t\t\t<a href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" class=\"f6 dib ph2 link mid-gray dim\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
+        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/language/\" title=\"Language\">Language</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/terms/\" title=\"Legal\">Legal stuff</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" target=\"_blank\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
     }
     //////////// TODO ////////////
     // mini state ;) It's ugly, I know...

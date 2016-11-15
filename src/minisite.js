@@ -231,9 +231,9 @@ window.minisite = (function(env) {
 	<footer class="pb4">
 		<small class="f6 db tc">© 2016 <b class="ttu">Offirmo Inc</b>., All Rights Reserved</small>
 		<div class="tc mt3">
-			<a href="/language/"        title="Language" class="f6 dib ph2 link mid-gray dim">Language</a>
-			<a href="/terms/"            title="Legal" class="f6 dib ph2 link mid-gray dim">Legal stuff</a>
-			<a href="${CONSTS.REPO_URL}" title="fork" class="f6 dib ph2 link mid-gray dim">Fork on Github</a>
+			<a class="f6 dib ph2 link mid-gray dim" href="/language/" title="Language">Language</a>
+			<a class="f6 dib ph2 link mid-gray dim" href="/terms/" title="Legal">Legal stuff</a>
+			<a class="f6 dib ph2 link mid-gray dim" href="${CONSTS.REPO_URL}" title="fork" target="_blank">Fork on Github</a>
 		</div>
 	</footer>
 </div>
