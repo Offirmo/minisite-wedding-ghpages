@@ -4,7 +4,7 @@ anchor:
   fr: "Contact"
 background: ""
 layout: contact
-picture: "save0001.png"
+picture: "letter.png"
 ---
 `en`
 

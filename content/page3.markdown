@@ -4,7 +4,7 @@ anchor:
   fr: "Le jour J"
 background: ""
 layout: default
-picture: "save0001.png"
+picture: "day.jpg"
 ---
 `en`
 

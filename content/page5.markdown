@@ -4,7 +4,7 @@ anchor:
   fr: "Liste de mariage"
 background: ""
 layout: default
-picture: "save0001.png"
+picture: "gifts.jpg"
 ---
 `en`
 

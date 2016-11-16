@@ -131,7 +131,7 @@ window.minisite = (function (env) {
     }
     function TEMPLATE_FULLPAGE_FOOTER(lang) {
         // TODO localize
-        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/language/\" title=\"Language\">Language</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/terms/\" title=\"Legal\">Legal stuff</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" target=\"_blank\" rel=\"noopener noreferrer\">Fork on Github</a>\n\t\t</div>\n\t</footer>\n</div>\n";
+        return "\n<div class=\"section fp-auto-height\">\n\t<footer class=\"pb4\">\n\t\t<small class=\"f6 db tc\">\u00A9 2016 <b class=\"ttu\">Offirmo Inc</b>., All Rights Reserved</small>\n\t\t<div class=\"tc mt3\">\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"/terms/\" title=\"Legal\">Legal stuff</a>\n\t\t\t<a class=\"f6 dib ph2 link mid-gray dim\" href=\"" + CONSTS.REPO_URL + "\" title=\"fork\" target=\"_blank\" rel=\"noopener noreferrer\">Fork on Github</a>\n\t\t\t<a href=\"\" onClick=\"logout()\"><svg viewBox=\"0 0 1000 1000\" class=\"h1 w1\"><g>\n\t\t\t\t<path d=\"M485.3,572h29.4c30.4,0,55.2-24.8,55.2-55.2V63.9c0-30.4-24.9-55.2-55.2-55.2h-29.4c-30.4,0-55.2,24.9-55.2,55.2v452.9C430.1,547.1,454.9,572,485.3,572z\"/>\n\t\t\t\t<path d=\"M763.8,114.4c-23.2-14.3-53,2.8-53,30v74.9c0,17.9,7.7,35,21.2,46.7c75.7,65.9,122.1,140.5,117.4,250.4C841.9,696,696.7,842.1,517.1,850.7c-200.6,9.6-366.9-150.8-366.9-349.3c0-105.2,46.7-175.1,120.4-237.8c13.3-11.3,20.8-28.1,20.8-45.6v-74c0-27.8-30.5-44.8-54.2-30.3C98.5,198.9,7,332.8,10.1,509.9C14.5,768.5,222.2,980.9,480.6,991c279,10.8,509.4-213,509.4-489.6C990,328.2,899.7,198.2,763.8,114.4z\"/>\n\t\t\t\t</g></svg></a>\n\t\t</div>\n\t</footer>\n</div>\n";
     }
     //////////// TODO ////////////
     // mini state ;) It's ugly, I know...
@@ -367,9 +367,10 @@ window.minisite = (function (env) {
             logger.log("activating fullpage...");
             $('#fullpage').fullpage({
                 sectionsColor: pages.map(function (page, i) { return page.meta.background; }),
-                anchors: pages.map(function (page, i) { return "page" + (i + 1); }),
+                anchors: pages.map(function (page, i) { return "page" + (i + 1); }).concat('footer'),
                 menu: '#fp-menu',
                 paddingTop: '48px',
+                //verticalCentered: false,
                 bigSectionsDestination: 'top',
                 //scrollBar: $(window).width() > CONSTS.NOT_SMALL_WIDTH_PX,
                 scrollOverflow: $(window).width() > CONSTS.NOT_SMALL_WIDTH_PX,
@@ -566,6 +567,11 @@ window.minisite = (function (env) {
         .then(render_wall)
         .catch(function (e) { return logger.error('latest wall rendering error', e); });
     ////////////////////////////////////
+    env.logout = function () {
+        Object.keys(CONSTS.LS_KEYS).forEach(function (k, v) {
+            env.localStorage.clear();
+        });
+    };
     env.authentify = function (user_selected_lang, password, from_saved_data) {
         if (from_saved_data === void 0) { from_saved_data = false; }
         //logger.info('[authentify]', {user_selected_lang, password, from_saved_data, state.authentified})
