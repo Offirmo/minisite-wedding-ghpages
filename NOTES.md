@@ -15,13 +15,15 @@ TODO
   http://alvarotrigo.com/fullPage/examples/responsive.html#firstPage
   http://stackoverflow.com/questions/33288286/fullpage-js-and-mobile-devices-how-to-enable-section-slide-switch-if-content
 - ☐ intro
-- ☐ layouts
+- ☑ layouts
 - ☐ maps
 - ☐ contact
-- ☐ pics by Chloe
+- ☑ pics by Chloe
 - ☐ backgrounds
 - ☐ photos
   http://photoswipe.com/
+- ☑ clever scrollbar 
+  https://github.com/believer-ufa/clever-scrollbar
 
 
 browser-sync start --server --files "dist" "content" "src"
