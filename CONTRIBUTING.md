@@ -3,16 +3,11 @@
 ```
 npm i -gs yarn
 yarn
-yarn --modules-folder yarn_modules
-yarn --flat --modules-folder yarn_modules
 ```
 
 ## Operations
-Add dependencies with:
-```
-yarn add --flat --modules-folder yarn_modules  jquery
-yarn add --flat --modules-folder yarn_modules --dev jquery
-```
+Add dependencies by doing... TODO
+
 
 ## Notes
 * https://github.com/alvarotrigo/fullPage.js
