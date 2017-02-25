@@ -4,13 +4,15 @@ anchor:
   fr: "Contact"
 background: ""
 layout: contact
-picture: "letter.png"
+picture: "letter_blank.png"
 ---
 `en`
 
 ## Contact
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate.
+
+
 
 `fr`
 

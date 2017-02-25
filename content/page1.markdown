@@ -4,12 +4,14 @@ anchor:
   fr: "Accueil"
 background: ""
 layout: home
-picture: "home.jpg"
+picture: "looking_at_map.png"
 ---
 `en`
 
-## Welcome to our wedding !
+## On the way to our wedding !
+
+
 
 `fr`
 
-## Bienvenue à notre mariage !
+## En route pour notre mariage !

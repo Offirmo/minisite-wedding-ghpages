@@ -148,10 +148,10 @@ window.minisite = (function(env) {
 	}
 
 	function TEMPLATE_FULLPAGE_SECTION_HOME(data) {
-		const { lang, bride, groom, title } = data
+		const { lang, bride, groom, title, picture } = data
 
 		return `
-<div class="section" style="background:url(content/couple.png) no-repeat center; background-size: contain;" >
+<div class="section" style="background:url(content/${picture}) no-repeat center; background-size: contain;" >
       
 		<article class="dt w-100">
 			<div class="dtc v-mid tc">

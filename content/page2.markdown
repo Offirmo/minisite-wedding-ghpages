@@ -1,7 +1,7 @@
 ---
 anchor:
-  en: "Venue"
-  fr: "Comment venir ?"
+  en: "Where and how ?"
+  fr: "Où et comment ?"
 background: ""
 layout: map
 coordinate_01:
@@ -30,6 +30,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id es
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
 
 [print itinerary](www.google.com)
+
+
 
 `fr`
 

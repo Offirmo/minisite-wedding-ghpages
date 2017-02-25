@@ -114,8 +114,8 @@ window.minisite = (function (env) {
         return "\n<a class=\"link near-black dib mr3 mr4-ns\" href=\"#page" + page_id + "\">" + anchor + "</a>\n\t";
     }
     function TEMPLATE_FULLPAGE_SECTION_HOME(data) {
-        var lang = data.lang, bride = data.bride, groom = data.groom, title = data.title;
-        return "\n<div class=\"section\" style=\"background:url(content/couple.png) no-repeat center; background-size: contain;\" >\n      \n\t\t<article class=\"dt w-100\">\n\t\t\t<div class=\"dtc v-mid tc\">\n\t\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t\t<h2 class=\"f3 f2-ns\">" + title + "</h2>\n\t\n\t\t\t\t<!-- <div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div> -->\n\t\t\t</div>\n\t\t</article>\n</div>\n";
+        var lang = data.lang, bride = data.bride, groom = data.groom, title = data.title, picture = data.picture;
+        return "\n<div class=\"section\" style=\"background:url(content/" + picture + ") no-repeat center; background-size: contain;\" >\n      \n\t\t<article class=\"dt w-100\">\n\t\t\t<div class=\"dtc v-mid tc\">\n\t\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t\t<h2 class=\"f3 f2-ns\">" + title + "</h2>\n\t\n\t\t\t\t<!-- <div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div> -->\n\t\t\t</div>\n\t\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_SECTION_DEFAULT(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
