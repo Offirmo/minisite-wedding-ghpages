@@ -454,7 +454,7 @@ window.minisite = (function(env) {
 		el_fullpage.innerHTML = new_html
 	}
 
-	function render_maps(pages, config) {
+	function render_maps(pages, config, lang) {
 		logger.log(`rendering maps...`, {pages, config})
 		let { mapbox_access_token } = config
 
@@ -471,15 +471,23 @@ window.minisite = (function(env) {
 		pages.forEach((page, index) => {
 			if (page.meta.layout !== 'map') return
 
+			logger.groupCollapsed(`Activating map on page #${index}`)
+			logger.log(`data =`, page.meta)
+
 			const container_id = get_unique_section_container_id(index)
 			logger.log(`map container id =`, container_id)
+
+			const { map_center_coordinates, map_radius, points } = page.meta
+			logger.log(`map center and radius =`, { map_center_coordinates, map_radius })
+			logger.log(`found POI =`, points)
 
 			// leaflet doesn't like when it's container changes its size
 			// So we delay the setup a bit to wait for redraw.
 			// http://stackoverflow.com/questions/17863904/leaflet-mapbox-rendering-issue-grey-area
 			setTimeout(function setup_map_on_stable_dom() {
 				const leaflet_map = leaflet.map(container_id)
-				leaflet_map.setView([51.505, -0.09], 13);
+				//leaflet_map.setView([51.505, -0.09], 13)
+				leaflet_map.setView(map_center_coordinates, map_radius)
 
 				leaflet.tileLayer(`https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${mapbox_access_token}`, {
 					maxZoom: 18,
@@ -489,9 +497,12 @@ window.minisite = (function(env) {
 					id: 'mapbox.streets'
 				}).addTo(leaflet_map);
 
-				const marker = leaflet.marker([51.5, -0.09])
-				marker.addTo(leaflet_map);
-				marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+				points.forEach(poi => {
+					const marker = leaflet.marker(poi.coordinates)
+					marker.addTo(leaflet_map)
+					//marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup()
+					marker.bindPopup(poi.labels[lang || 'en']).openPopup()
+				})
 
 				// TODO
 				// http://stackoverflow.com/questions/16845614/zoom-to-fit-all-markers-in-mapbox-or-leaflet
@@ -518,6 +529,8 @@ window.minisite = (function(env) {
 				 .openOn(mymap);
 				 */
 			}, 5)
+
+			logger.groupEnd()
 		})
 	}
 

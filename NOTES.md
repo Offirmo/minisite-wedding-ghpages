@@ -14,15 +14,15 @@ TODO
 - ☑ fullpage mobile
   http://alvarotrigo.com/fullPage/examples/responsive.html#firstPage
   http://stackoverflow.com/questions/33288286/fullpage-js-and-mobile-devices-how-to-enable-section-slide-switch-if-content
-- ☐ intro
+- ☑ intro
 - ☑ layouts
 - ☐ maps
 - ☐ contact
 - ☑ pics by Chloe
-- ☐ backgrounds
+- ☑ backgrounds
 - ☐ photos
   http://photoswipe.com/
-- ☑ clever scrollbar 
+- ☑ clever scrollbar
   https://github.com/believer-ufa/clever-scrollbar
 
 

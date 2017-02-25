@@ -4,14 +4,27 @@ anchor:
   fr: "Où et comment ?"
 background: ""
 layout: map
-coordinate_01:
-  position: xyz
-  en: "coordinate 1"
-  fr: "coordonnées 1"
+map_center_coordinates:
+  - 48.857051
+  - 2.341385
+map_radius: 14
+points:
+  - labels:
+      en: "Reception"
+      fr: "Réception"
+    coordinates:
+      - 48.861031
+      - 2.335918
+  - labels:
+      en: "Church of XYZ"
+      fr: "Eglise de XYZ"
+    coordinates:
+      - 48.85330955384231
+      - 2.3490295325452166
 ---
 `en`
 
-## Venue
+## Where and how ?
 
 In order to come to XXX :
 
@@ -35,7 +48,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id es
 
 `fr`
 
-## Comment venir ?
+## Où et comment ?
 
 Pour se rendre à XXX :
 

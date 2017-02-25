@@ -305,7 +305,7 @@ window.minisite = (function (env) {
         var el_fullpage = document.querySelectorAll('#fullpage')[0];
         el_fullpage.innerHTML = new_html;
     }
-    function render_maps(pages, config) {
+    function render_maps(pages, config, lang) {
         logger.log("rendering maps...", { pages: pages, config: config });
         var mapbox_access_token = config.mapbox_access_token;
         if (mapbox_access_token.slice(1, 21) === 'get a token for free') {
@@ -320,14 +320,20 @@ window.minisite = (function (env) {
         pages.forEach(function (page, index) {
             if (page.meta.layout !== 'map')
                 return;
+            logger.groupCollapsed("Activating map on page #" + index);
+            logger.log("data =", page.meta);
             var container_id = get_unique_section_container_id(index);
             logger.log("map container id =", container_id);
+            var _a = page.meta, map_center_coordinates = _a.map_center_coordinates, map_radius = _a.map_radius, points = _a.points;
+            logger.log("map center and radius =", { map_center_coordinates: map_center_coordinates, map_radius: map_radius });
+            logger.log("found POI =", points);
             // leaflet doesn't like when it's container changes its size
             // So we delay the setup a bit to wait for redraw.
             // http://stackoverflow.com/questions/17863904/leaflet-mapbox-rendering-issue-grey-area
             setTimeout(function setup_map_on_stable_dom() {
                 var leaflet_map = leaflet.map(container_id);
-                leaflet_map.setView([51.505, -0.09], 13);
+                //leaflet_map.setView([51.505, -0.09], 13)
+                leaflet_map.setView(map_center_coordinates, map_radius);
                 leaflet.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=" + mapbox_access_token, {
                     maxZoom: 18,
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -335,9 +341,12 @@ window.minisite = (function (env) {
                         'Imagery © <a href="http://mapbox.com">Mapbox</a>',
                     id: 'mapbox.streets'
                 }).addTo(leaflet_map);
-                var marker = leaflet.marker([51.5, -0.09]);
-                marker.addTo(leaflet_map);
-                marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+                points.forEach(function (poi) {
+                    var marker = leaflet.marker(poi.coordinates);
+                    marker.addTo(leaflet_map);
+                    //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup()
+                    marker.bindPopup(poi.labels[lang || 'en']).openPopup();
+                });
                 // TODO
                 // http://stackoverflow.com/questions/16845614/zoom-to-fit-all-markers-in-mapbox-or-leaflet
                 /*
@@ -362,6 +371,7 @@ window.minisite = (function (env) {
                  .openOn(mymap);
                  */
             }, 5);
+            logger.groupEnd();
         });
     }
     function render_main(config, pages, lang) {
