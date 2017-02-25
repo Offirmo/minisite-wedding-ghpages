@@ -4,18 +4,32 @@ anchor:
   fr: "Comment venir ?"
 background: ""
 layout: map
-picture: "save0001.png"
-coordinates: xxx
+coordinate_01:
+  position: xyz
+  en: "coordinate 1"
+  fr: "coordonnées 1"
 ---
 `en`
 
 ## Venue
 
- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula. Suspendisse eget arcu eu neque feugiat consequat at non mi. Aenean rutrum lacinia enim, eu vulputate velit tempor vitae. Nullam lacinia egestas venenatis. Etiam vestibulum massa eget nisl feugiat cursus. Mauris cursus imperdiet laoreet. Quisque malesuada lectus et orci rhoncus, ut suscipit elit gravida.
+In order to come to XXX :
 
-Morbi rhoncus arcu felis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer at turpis ut quam ornare auctor quis venenatis diam. Praesent fringilla dui nec tortor hendrerit, nec elementum dui hendrerit. Integer nec sapien sit amet enim commodo rhoncus. Donec nec nisl pretium, ultrices tortor id, ornare enim. Etiam pellentesque malesuada risus at imperdiet. Vivamus ac eleifend purus. Ut bibendum turpis eu orci pharetra, eget porttitor orci bibendum. Sed at orci nec quam cursus consectetur sit amet sed velit. Vestibulum ut tempor sem. Vivamus id sem tortor. Sed ut lacus venenatis, rhoncus orci vel, accumsan augue.
+### By car
 
-Pellentesque velit sem, feugiat at magna eu, tristique scelerisque purus. Praesent a lorem lorem. Praesent commodo rhoncus nisi, vel tempus massa egestas et. Maecenas ac fringilla magna. Mauris ullamcorper laoreet magna, eget ullamcorper libero consequat sed. Quisque eu faucibus magna. Maecenas dictum porta sem sit amet tincidunt. Vestibulum ac malesuada augue. Suspendisse vestibulum ex non tempor cursus.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
+
+[print itinerary](www.google.com)
+
+### By train
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
+
+### By plane
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
+
+[print itinerary](www.google.com)
 
 `fr`
 
@@ -23,19 +37,18 @@ Pellentesque velit sem, feugiat at magna eu, tristique scelerisque purus. Praese
 
 Pour se rendre à XXX :
 
-
 ### En voiture
 
- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula. Suspendisse eget arcu eu neque feugiat consequat at non mi. Aenean rutrum lacinia enim, eu vulputate velit tempor vitae. Nullam lacinia egestas venenatis. Etiam vestibulum massa eget nisl feugiat cursus. Mauris cursus imperdiet laoreet. Quisque malesuada lectus et orci rhoncus, ut suscipit elit gravida.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
 
 [Imprimer l’itinéraire détaillé](www.google.com)
 
 ### En train
 
- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula. Suspendisse eget arcu eu neque feugiat consequat at non mi. Aenean rutrum lacinia enim, eu vulputate velit tempor vitae. Nullam lacinia egestas venenatis. Etiam vestibulum massa eget nisl feugiat cursus. Mauris cursus imperdiet laoreet. Quisque malesuada lectus et orci rhoncus, ut suscipit elit gravida.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
 
 ### En avion
 
- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula. Suspendisse eget arcu eu neque feugiat consequat at non mi. Aenean rutrum lacinia enim, eu vulputate velit tempor vitae. Nullam lacinia egestas venenatis. Etiam vestibulum massa eget nisl feugiat cursus. Mauris cursus imperdiet laoreet. Quisque malesuada lectus et orci rhoncus, ut suscipit elit gravida.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula.
 
 [Imprimer l’itinéraire détaillé](www.google.com)

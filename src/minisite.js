@@ -100,19 +100,19 @@ window.minisite = (function(env) {
 		},
 		wall_text: {
 			en: 'Access to this website is reserved to family and friends.',
-			fr: 'L\'accès à ce site est réservé à la famille et aux amis.',
+			fr: 'L’accès à ce site est réservé à la famille et aux amis.',
 		},
 		wall_password_label: {
-			en: 'Password:',
-			fr: 'Mot de passe :',
+			en: 'Access key:',
+			fr: 'Clé d’accès :',
 		},
 		wall_password_placeholder: {
 			en: 'XYZ:',
 			fr: 'XYZ',
 		},
 		wall_password_cta: {
-			en: 'Enter',
-			fr: 'Entrer',
+			en: 'Enter (english language)',
+			fr: 'Entrer (en langue française)',
 		},
 	}
 
@@ -148,18 +148,19 @@ window.minisite = (function(env) {
 	}
 
 	function TEMPLATE_FULLPAGE_SECTION_HOME(data) {
-		const { lang, bride, groom } = data
+		const { lang, bride, groom, title } = data
 
 		return `
-<div class="section">
-	<article class="dt w-100">
-		<div class="dtc v-mid tc">
-			<h1 class="f2 f1-ns">${I18N.wall_header[lang]({ bride, groom })}</h1>
-			<h2 class="f3 f2-ns">TODO Lorem ipsum dolor sit amet</h2>
-
-			<!-- <div id="countdown" class="dib" style="width: auto; transform: scale(.5);"></div> -->
-		</div>
-	</article>
+<div class="section" style="background:url(content/couple.png) no-repeat center; background-size: contain;" >
+      
+		<article class="dt w-100">
+			<div class="dtc v-mid tc">
+				<h1 class="f2 f1-ns">${I18N.wall_header[lang]({ bride, groom })}</h1>
+				<h2 class="f3 f2-ns">${title}</h2>
+	
+				<!-- <div id="countdown" class="dib" style="width: auto; transform: scale(.5);"></div> -->
+			</div>
+		</article>
 </div>
 `
 	}
@@ -185,7 +186,7 @@ window.minisite = (function(env) {
 	}
 
 	function TEMPLATE_FULLPAGE_SECTION_MAP(data) {
-		const { title, container_id, picture, markdown } = data
+		const { title, container_id, markdown } = data
 
 		return `
 <div class="section">
@@ -203,6 +204,7 @@ window.minisite = (function(env) {
 </div>
 `
 	}
+
 	function TEMPLATE_FULLPAGE_SECTION_CONTACT(data) {
 		const { title, picture, markdown } = data
 
@@ -250,7 +252,7 @@ window.minisite = (function(env) {
 		errors: [],
 		authentified: false,
 	}
-	function report_error_msg(msg) { logger.error(msg), state.errors.push(msg)}
+	function report_error_msg(msg) { logger.error(msg); state.errors.push(msg)}
 
 	//////////// LIBS ////////////
 
@@ -454,6 +456,17 @@ window.minisite = (function(env) {
 
 	function render_maps(pages, config) {
 		logger.log(`rendering maps...`, {pages, config})
+		let { mapbox_access_token } = config
+
+		if (mapbox_access_token.slice(1, 21) === 'get a token for free') {
+			if (location.origin === 'http://www.offirmo.net') {
+				// please don't steal this token, that would be very nice...
+				// just register for free on https://www.mapbox.com/ to get one
+				mapbox_access_token = 'pk.eyJ1Ijoib2ZmaXJtbyIsImEiOiJjaXprdm10ZXMwMGd6MzJvMXMxYWk3bmN3In0.fcWB3oi-cE0b2g0VvuObFw'
+			}
+			else
+				mapbox_access_token = 'todo-see-config.yaml'
+		}
 
 		pages.forEach((page, index) => {
 			if (page.meta.layout !== 'map') return
@@ -468,7 +481,7 @@ window.minisite = (function(env) {
 				const leaflet_map = leaflet.map(container_id)
 				leaflet_map.setView([51.505, -0.09], 13);
 
-				leaflet.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+				leaflet.tileLayer(`https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${mapbox_access_token}`, {
 					maxZoom: 18,
 					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -852,7 +865,7 @@ window.minisite = (function(env) {
 		return false
 	}
 
-	cascade.dom_ready.then(() => {
+	cascade.dom_ready.then(function attempt_auto_auth() {
 		const last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password)
 		if (!last_successful_password) return
 

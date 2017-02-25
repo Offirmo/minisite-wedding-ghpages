@@ -4,16 +4,12 @@ anchor:
   fr: "Accueil"
 background: ""
 layout: home
-picture: "save0001.png"
+picture: "home.jpg"
 ---
 `en`
 
-## Welcome to our wedding
-
-Hello [world](http://www.google.com)
+## Welcome to our wedding !
 
 `fr`
 
-## Bienvenue à notre mariage
-
-### Préparez-vous pour le jour J
+## Bienvenue à notre mariage !

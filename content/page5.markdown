@@ -1,14 +1,14 @@
 ---
 anchor:
-  en: "Registry"
-  fr: "Liste de mariage"
+  en: "Stay the WE"
+  fr: "Prolonger son WE"
 background: ""
 layout: default
-picture: "gifts.jpg"
+picture: "stay.jpg"
 ---
 `en`
 
-## Registry
+## Stay the WE
 
  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula. Suspendisse eget arcu eu neque feugiat consequat at non mi. Aenean rutrum lacinia enim, eu vulputate velit tempor vitae. Nullam lacinia egestas venenatis. Etiam vestibulum massa eget nisl feugiat cursus. Mauris cursus imperdiet laoreet. Quisque malesuada lectus et orci rhoncus, ut suscipit elit gravida.
 
@@ -18,7 +18,7 @@ Pellentesque velit sem, feugiat at magna eu, tristique scelerisque purus. Praese
 
 `fr`
 
-## Liste de mariage
+## Prolonger son WE
 
  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam gravida leo id est bibendum vulputate. Proin urna sapien, pulvinar hendrerit rutrum at, mollis vel justo. Etiam congue interdum nunc quis vehicula. Suspendisse eget arcu eu neque feugiat consequat at non mi. Aenean rutrum lacinia enim, eu vulputate velit tempor vitae. Nullam lacinia egestas venenatis. Etiam vestibulum massa eget nisl feugiat cursus. Mauris cursus imperdiet laoreet. Quisque malesuada lectus et orci rhoncus, ut suscipit elit gravida.
 

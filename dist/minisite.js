@@ -89,19 +89,19 @@ window.minisite = (function (env) {
         },
         wall_text: {
             en: 'Access to this website is reserved to family and friends.',
-            fr: 'L\'accès à ce site est réservé à la famille et aux amis.',
+            fr: 'L’accès à ce site est réservé à la famille et aux amis.',
         },
         wall_password_label: {
-            en: 'Password:',
-            fr: 'Mot de passe :',
+            en: 'Access key:',
+            fr: 'Clé d’accès :',
         },
         wall_password_placeholder: {
             en: 'XYZ:',
             fr: 'XYZ',
         },
         wall_password_cta: {
-            en: 'Enter',
-            fr: 'Entrer',
+            en: 'Enter (english language)',
+            fr: 'Entrer (en langue française)',
         },
     };
     //////////// TEMPLATES ////////////
@@ -114,15 +114,15 @@ window.minisite = (function (env) {
         return "\n<a class=\"link near-black dib mr3 mr4-ns\" href=\"#page" + page_id + "\">" + anchor + "</a>\n\t";
     }
     function TEMPLATE_FULLPAGE_SECTION_HOME(data) {
-        var lang = data.lang, bride = data.bride, groom = data.groom;
-        return "\n<div class=\"section\">\n\t<article class=\"dt w-100\">\n\t\t<div class=\"dtc v-mid tc\">\n\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t<h2 class=\"f3 f2-ns\">TODO Lorem ipsum dolor sit amet</h2>\n\n\t\t\t<!-- <div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div> -->\n\t\t</div>\n\t</article>\n</div>\n";
+        var lang = data.lang, bride = data.bride, groom = data.groom, title = data.title;
+        return "\n<div class=\"section\" style=\"background:url(content/couple.png) no-repeat center; background-size: contain;\" >\n      \n\t\t<article class=\"dt w-100\">\n\t\t\t<div class=\"dtc v-mid tc\">\n\t\t\t\t<h1 class=\"f2 f1-ns\">" + I18N.wall_header[lang]({ bride: bride, groom: groom }) + "</h1>\n\t\t\t\t<h2 class=\"f3 f2-ns\">" + title + "</h2>\n\t\n\t\t\t\t<!-- <div id=\"countdown\" class=\"dib\" style=\"width: auto; transform: scale(.5);\"></div> -->\n\t\t\t</div>\n\t\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_SECTION_DEFAULT(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
         return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_SECTION_MAP(data) {
-        var title = data.title, container_id = data.container_id, picture = data.picture, markdown = data.markdown;
+        var title = data.title, container_id = data.container_id, markdown = data.markdown;
         return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<div id=\"" + container_id + "\" class=\"aspect-ratio aspect-ratio--6x4\"></div>\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_SECTION_CONTACT(data) {
@@ -139,7 +139,7 @@ window.minisite = (function (env) {
         errors: [],
         authentified: false,
     };
-    function report_error_msg(msg) { logger.error(msg), state.errors.push(msg); }
+    function report_error_msg(msg) { logger.error(msg); state.errors.push(msg); }
     //////////// LIBS ////////////
     var logger = console;
     logger.log('constants =', CONSTS);
@@ -307,6 +307,16 @@ window.minisite = (function (env) {
     }
     function render_maps(pages, config) {
         logger.log("rendering maps...", { pages: pages, config: config });
+        var mapbox_access_token = config.mapbox_access_token;
+        if (mapbox_access_token.slice(1, 21) === 'get a token for free') {
+            if (location.origin === 'http://www.offirmo.net') {
+                // please don't steal this token, that would be very nice...
+                // just register for free on https://www.mapbox.com/ to get one
+                mapbox_access_token = 'pk.eyJ1Ijoib2ZmaXJtbyIsImEiOiJjaXprdm10ZXMwMGd6MzJvMXMxYWk3bmN3In0.fcWB3oi-cE0b2g0VvuObFw';
+            }
+            else
+                mapbox_access_token = 'todo-see-config.yaml';
+        }
         pages.forEach(function (page, index) {
             if (page.meta.layout !== 'map')
                 return;
@@ -318,7 +328,7 @@ window.minisite = (function (env) {
             setTimeout(function setup_map_on_stable_dom() {
                 var leaflet_map = leaflet.map(container_id);
                 leaflet_map.setView([51.505, -0.09], 13);
-                leaflet.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+                leaflet.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=" + mapbox_access_token, {
                     maxZoom: 18,
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
                         '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -608,11 +618,12 @@ window.minisite = (function (env) {
                     .catch(function (e) { return logger.error('rendering error', e); });
             }
             else {
+                // TODO show instructions for acquiring password !
             }
         });
         return false;
     };
-    cascade.dom_ready.then(function () {
+    cascade.dom_ready.then(function attempt_auto_auth() {
         var last_successful_password = env.localStorage.getItem(CONSTS.LS_KEYS.last_successful_password);
         if (!last_successful_password)
             return;
