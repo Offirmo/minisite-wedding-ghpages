@@ -477,9 +477,27 @@ window.minisite = (function(env) {
 			const container_id = get_unique_section_container_id(index)
 			logger.log(`map container id =`, container_id)
 
-			const { map_center_coordinates, map_radius, points } = page.meta
-			logger.log(`map center and radius =`, { map_center_coordinates, map_radius })
+			const { points } = page.meta
 			logger.log(`found POI =`, points)
+			let center_coordinates = [0, 0]
+			let { radius } = page.meta
+
+			let min = [10000000, 10000000]
+			let max = [-10000000, -10000000]
+			points.forEach(poi => {
+				min[0] = Math.min(min[0], poi.coordinates[0])
+				min[1] = Math.min(min[1], poi.coordinates[1])
+				max[0] = Math.max(max[0], poi.coordinates[0])
+				max[1] = Math.max(max[1], poi.coordinates[1])
+				center_coordinates[0] += poi.coordinates[0]
+				center_coordinates[1] += poi.coordinates[1]
+			})
+			center_coordinates[0] = center_coordinates[0] / points.length
+			center_coordinates[1] = center_coordinates[1] / points.length
+			console.log('radius compute ??', max[0] - min[0], max[1] - min[1], (max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015)
+			radius = radius || Math.max( (max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015 )
+			logger.log(`map center and radius =`, { center_coordinates, radius })
+
 
 			// leaflet doesn't like when it's container changes its size
 			// So we delay the setup a bit to wait for redraw.
@@ -487,7 +505,7 @@ window.minisite = (function(env) {
 			setTimeout(function setup_map_on_stable_dom() {
 				const leaflet_map = leaflet.map(container_id)
 				//leaflet_map.setView([51.505, -0.09], 13)
-				leaflet_map.setView(map_center_coordinates, map_radius)
+				leaflet_map.setView(center_coordinates, radius)
 
 				leaflet.tileLayer(`https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${mapbox_access_token}`, {
 					maxZoom: 18,
@@ -501,7 +519,7 @@ window.minisite = (function(env) {
 					const marker = leaflet.marker(poi.coordinates)
 					marker.addTo(leaflet_map)
 					//marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup()
-					marker.bindPopup(poi.labels[lang || 'en']).openPopup()
+					marker.bindTooltip(poi.labels[lang || 'en']).openTooltip()
 				})
 
 				// TODO
@@ -835,8 +853,10 @@ window.minisite = (function(env) {
 		best_config.then(config => {
 			logger.info(`[authentify] config ready, advancing...`)
 
-			//logger.info(`[authentify] checking pwd against "${config.password}"…`)
-			if (password === config.password) {
+			//logger.info(`[authentify] checking pwd against "${config.password.toLowerCase()}"…`)
+			// convert to lower case for accessibility (ex. mobile capitalizing the 1st letter)
+			// We completely assume this is a low security.
+			if (password.toLowerCase() === config.password.toLowerCase()) {
 				logger.info(`[authentify] success !`)
 				state.authentified = true
 

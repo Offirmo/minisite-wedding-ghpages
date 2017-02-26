@@ -4,10 +4,6 @@ anchor:
   fr: "Où et comment ?"
 background: ""
 layout: map
-map_center_coordinates:
-  - 48.857051
-  - 2.341385
-map_radius: 14
 points:
   - labels:
       en: "Reception"

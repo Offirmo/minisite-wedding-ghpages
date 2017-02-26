@@ -324,16 +324,32 @@ window.minisite = (function (env) {
             logger.log("data =", page.meta);
             var container_id = get_unique_section_container_id(index);
             logger.log("map container id =", container_id);
-            var _a = page.meta, map_center_coordinates = _a.map_center_coordinates, map_radius = _a.map_radius, points = _a.points;
-            logger.log("map center and radius =", { map_center_coordinates: map_center_coordinates, map_radius: map_radius });
+            var points = page.meta.points;
             logger.log("found POI =", points);
+            var center_coordinates = [0, 0];
+            var radius = page.meta.radius;
+            var min = [10000000, 10000000];
+            var max = [-10000000, -10000000];
+            points.forEach(function (poi) {
+                min[0] = Math.min(min[0], poi.coordinates[0]);
+                min[1] = Math.min(min[1], poi.coordinates[1]);
+                max[0] = Math.max(max[0], poi.coordinates[0]);
+                max[1] = Math.max(max[1], poi.coordinates[1]);
+                center_coordinates[0] += poi.coordinates[0];
+                center_coordinates[1] += poi.coordinates[1];
+            });
+            center_coordinates[0] = center_coordinates[0] / points.length;
+            center_coordinates[1] = center_coordinates[1] / points.length;
+            console.log('radius compute ??', max[0] - min[0], max[1] - min[1], (max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015);
+            radius = radius || Math.max((max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015);
+            logger.log("map center and radius =", { center_coordinates: center_coordinates, radius: radius });
             // leaflet doesn't like when it's container changes its size
             // So we delay the setup a bit to wait for redraw.
             // http://stackoverflow.com/questions/17863904/leaflet-mapbox-rendering-issue-grey-area
             setTimeout(function setup_map_on_stable_dom() {
                 var leaflet_map = leaflet.map(container_id);
                 //leaflet_map.setView([51.505, -0.09], 13)
-                leaflet_map.setView(map_center_coordinates, map_radius);
+                leaflet_map.setView(center_coordinates, radius);
                 leaflet.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=" + mapbox_access_token, {
                     maxZoom: 18,
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -345,7 +361,7 @@ window.minisite = (function (env) {
                     var marker = leaflet.marker(poi.coordinates);
                     marker.addTo(leaflet_map);
                     //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup()
-                    marker.bindPopup(poi.labels[lang || 'en']).openPopup();
+                    marker.bindTooltip(poi.labels[lang || 'en']).openTooltip();
                 });
                 // TODO
                 // http://stackoverflow.com/questions/16845614/zoom-to-fit-all-markers-in-mapbox-or-leaflet
@@ -600,8 +616,10 @@ window.minisite = (function (env) {
         var best_config = promise_race_successful(cascade.config_latest, cascade.config_fast);
         best_config.then(function (config) {
             logger.info("[authentify] config ready, advancing...");
-            //logger.info(`[authentify] checking pwd against "${config.password}"…`)
-            if (password === config.password) {
+            //logger.info(`[authentify] checking pwd against "${config.password.toLowerCase()}"…`)
+            // convert to lower case for accessibility (ex. mobile capitalizing the 1st letter)
+            // We completely assume this is a low security.
+            if (password.toLowerCase() === config.password.toLowerCase()) {
                 logger.info("[authentify] success !");
                 state.authentified = true;
                 if (!from_saved_data) {
