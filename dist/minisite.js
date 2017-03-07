@@ -127,7 +127,7 @@ window.minisite = (function (env) {
     }
     function TEMPLATE_FULLPAGE_SECTION_CONTACT(data) {
         var title = data.title, picture = data.picture, markdown = data.markdown;
-        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t\tTODO contact form !\n\t\t</div>\n\t</article>\n</div>\n";
+        return "\n<div class=\"section\">\n\t<article class=\"cf ph3 ph5-ns pv3 center\">\n\t\t<header class=\"fn fl-ns w-50-ns pr4-ns\">\n\t\t\t<h1 class=\"f2 lh-title fw9 mb3 mt0 pt3\">\n\t\t\t\t" + title + "\n\t\t\t</h1>\n\t\t\t<img src=\"content/" + picture + "\" class=\"\">\n\t\t</header>\n\t\t<div class=\"fn fl-ns w-50-ns measure\">\n\t\t\t" + marked(markdown) + "\n\t\t</div>\n\t</article>\n</div>\n";
     }
     function TEMPLATE_FULLPAGE_FOOTER(lang) {
         // TODO localize
@@ -341,7 +341,7 @@ window.minisite = (function (env) {
             center_coordinates[0] = center_coordinates[0] / points.length;
             center_coordinates[1] = center_coordinates[1] / points.length;
             console.log('radius compute ??', max[0] - min[0], max[1] - min[1], (max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015);
-            radius = radius || Math.max((max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015);
+            radius = radius || Math.max(1 / ((max[0] - min[0]) * 5), 1 / ((max[1] - min[1]) * 5));
             logger.log("map center and radius =", { center_coordinates: center_coordinates, radius: radius });
             // leaflet doesn't like when it's container changes its size
             // So we delay the setup a bit to wait for redraw.
@@ -360,8 +360,8 @@ window.minisite = (function (env) {
                 points.forEach(function (poi) {
                     var marker = leaflet.marker(poi.coordinates);
                     marker.addTo(leaflet_map);
-                    //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup()
                     marker.bindTooltip(poi.labels[lang || 'en']).openTooltip();
+                    marker.bindPopup(poi.labels[lang || 'en']);
                 });
                 // TODO
                 // http://stackoverflow.com/questions/16845614/zoom-to-fit-all-markers-in-mapbox-or-leaflet

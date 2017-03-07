@@ -219,7 +219,6 @@ window.minisite = (function(env) {
 		</header>
 		<div class="fn fl-ns w-50-ns measure">
 			${marked(markdown)}
-			TODO contact form !
 		</div>
 	</article>
 </div>
@@ -495,7 +494,7 @@ window.minisite = (function(env) {
 			center_coordinates[0] = center_coordinates[0] / points.length
 			center_coordinates[1] = center_coordinates[1] / points.length
 			console.log('radius compute ??', max[0] - min[0], max[1] - min[1], (max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015)
-			radius = radius || Math.max( (max[0] - min[0]) * 14 / 0.0075, (max[1] - min[1]) * 14 / 0.015 )
+			radius = radius || Math.max( 1/((max[0] - min[0]) * 5), 1/((max[1] - min[1]) * 5) )
 			logger.log(`map center and radius =`, { center_coordinates, radius })
 
 
@@ -518,8 +517,8 @@ window.minisite = (function(env) {
 				points.forEach(poi => {
 					const marker = leaflet.marker(poi.coordinates)
 					marker.addTo(leaflet_map)
-					//marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup()
 					marker.bindTooltip(poi.labels[lang || 'en']).openTooltip()
+					marker.bindPopup(poi.labels[lang || 'en'])
 				})
 
 				// TODO

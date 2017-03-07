@@ -1,4 +1,11 @@
 
+TODO
+on click on pin: show adress
+list adresses below the map
+styles de listes
+
+
+
 
 
 		//style="width: 65em; margin: auto; transform: scale(.75);"
