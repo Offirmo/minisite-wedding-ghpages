@@ -114,6 +114,14 @@ window.minisite = (function(env) {
 			en: 'Enter (english language)',
 			fr: 'Entrer (en langue française)',
 		},
+		all_rights_reserved: {
+			en: 'All Rights Reserved',
+			fr: 'Tous droits réservés',
+		},
+		legal_mentions: {
+			en: 'Legal stuff',
+			fr: 'Mentions légales',
+		},
 	}
 
 	//////////// TEMPLATES ////////////
@@ -230,9 +238,9 @@ window.minisite = (function(env) {
 		return `
 <div class="section fp-auto-height">
 	<footer class="pb4">
-		<small class="f6 db tc">© 2016 <b class="ttu">Offirmo Inc</b>., All Rights Reserved</small>
+		<small class="f6 db tc">© 2016 <b class="ttu">Offirmo Inc</b>., ${I18N.all_rights_reserved[lang]}</small>
 		<div class="tc mt3">
-			<a class="f6 dib ph2 link mid-gray dim" href="/terms/" title="Legal">Legal stuff</a>
+			<a class="f6 dib ph2 link mid-gray dim" href="/terms/" title="Legal">${I18N.legal_mentions[lang]}</a>
 			<a class="f6 dib ph2 link mid-gray dim" href="${CONSTS.REPO_URL}" title="fork" target="_blank" rel="noopener noreferrer">Fork on Github</a>
 			<a href="" onClick="logout()"><svg viewBox="0 0 1000 1000" class="h1 w1"><g>
 				<path d="M485.3,572h29.4c30.4,0,55.2-24.8,55.2-55.2V63.9c0-30.4-24.9-55.2-55.2-55.2h-29.4c-30.4,0-55.2,24.9-55.2,55.2v452.9C430.1,547.1,454.9,572,485.3,572z"/>
@@ -445,7 +453,7 @@ window.minisite = (function(env) {
 						container_id: get_unique_section_container_id(i),
 					})
 				}),
-				TEMPLATE_FULLPAGE_FOOTER()
+				TEMPLATE_FULLPAGE_FOOTER(lang)
 			]
 			.join('\n')
 
