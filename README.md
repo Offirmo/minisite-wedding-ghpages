@@ -28,3 +28,6 @@ https://app.ewedding.com/demo?theme=candy
 
 ## Contributing
 See CONTRIBUTING.md
+
+## TODO
+https://linseedstudio.com/product/24-free-wedding-icons-by-temploola/
